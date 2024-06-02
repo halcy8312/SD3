@@ -3,7 +3,7 @@ import os
 import requests
 import random
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.getenv('SECRET_KEY', 'supersecretkey')  # 環境変数からシークレットキーを取得
 
 def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key, model, seed=None, output_format="png"):
@@ -76,4 +76,3 @@ def generate():
 
 if __name__ == '__main__':
     app.run()
-
