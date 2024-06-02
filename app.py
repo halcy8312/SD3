@@ -4,7 +4,7 @@ import requests
 import random
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # セッションの暗号化に使用するキー。安全のために本番環境では環境変数に設定します。
+app.secret_key = os.getenv('SECRET_KEY', 'supersecretkey')  # 環境変数からシークレットキーを取得
 
 def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key, model, seed=None, output_format="png"):
     url = f"https://api.stability.ai/v2beta/stable-image/generate/{model}"
@@ -16,7 +16,7 @@ def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key,
         "prompt": (None, prompt),
         "negative_prompt": (None, negative_prompt),
         "aspect_ratio": (None, aspect_ratio),
-        "style_preset": (None, style_ppreset),
+        "style_preset": (None, style_preset),
         "output_format": (None, output_format),
     }
     if seed is not None:
