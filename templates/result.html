@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生成結果</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>生成結果</h1>
+        <img src="{{ url_for('static', filename=image_path) }}" alt="Generated Image">
+        <form method="post" action="{{ url_for('back') }}">
+            <button type="submit" class="back-button">元のページに戻る</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -37,7 +37,8 @@ select {
     border-radius: 4px;
 }
 
-button.generate-button {
+button.generate-button,
+button.back-button {
     background: #007bff;
     color: #fff;
     border: none;
@@ -46,6 +47,7 @@ button.generate-button {
     float: right;
 }
 
-button.generate-button:hover {
+button.generate-button:hover,
+button.back-button:hover {
     background: #0056b3;
 }

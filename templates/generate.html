@@ -12,54 +12,54 @@
         <form method="post">
             <div class="form-group">
                 <label for="prompt">プロンプト:</label><br>
-                <textarea id="prompt" name="prompt" rows="3" placeholder="プロンプトをカンマで区切って入力してください"></textarea><br>
+                <textarea id="prompt" name="prompt" rows="3" placeholder="プロンプトをカンマで区切って入力してください">{{ session.get('prompt', '') }}</textarea><br>
             </div>
             <div class="form-group">
                 <label for="negative_prompt">ネガティブプロンプト:</label><br>
-                <textarea id="negative_prompt" name="negative_prompt" rows="3" placeholder="ネガティブプロンプトをカンマで区切って入力してください"></textarea><br>
+                <textarea id="negative_prompt" name="negative_prompt" rows="3" placeholder="ネガティブプロンプトをカンマで区切って入力してください">{{ session.get('negative_prompt', '') }}</textarea><br>
             </div>
             <div class="form-group">
                 <label for="aspect_ratio">アスペクト比:</label><br>
                 <select id="aspect_ratio" name="aspect_ratio">
-                    <option value="1:1">1:1</option>
-                    <option value="16:9">16:9</option>
-                    <option value="4:3">4:3</option>
-                    <option value="3:2">3:2</option>
-                    <option value="9:16">9:16</option>
+                    <option value="1:1" {{ 'selected' if session.get('aspect_ratio') == '1:1' else '' }}>1:1</option>
+                    <option value="16:9" {{ 'selected' if session.get('aspect_ratio') == '16:9' else '' }}>16:9</option>
+                    <option value="4:3" {{ 'selected' if session.get('aspect_ratio') == '4:3' else '' }}>4:3</option>
+                    <option value="3:2" {{ 'selected' if session.get('aspect_ratio') == '3:2' else '' }}>3:2</option>
+                    <option value="9:16" {{ 'selected' if session.get('aspect_ratio') == '9:16' else '' }}>9:16</option>
                 </select><br>
             </div>
             <div class="form-group">
                 <label for="style_preset">スタイルプリセット:</label><br>
                 <select id="style_preset" name="style_preset">
-                    <option value="enhance">enhance</option>
-                    <option value="anime">anime</option>
-                    <option value="photographic">photographic</option>
-                    <option value="digital-art">digital-art</option>
-                    <option value="comic-book">comic-book</option>
-                    <option value="fantasy-art">fantasy-art</option>
-                    <option value="line-art">line-art</option>
-                    <option value="analog-film">analog-film</option>
-                    <option value="neon-punk">neon-punk</option>
-                    <option value="isometric">isometric</</option>
-                    <option value="low-poly">low-poly</option>
-                    <option value="origami">origami</option>
-                    <option value="modeling-compound">modeling-compound</option>
-                    <option value="cinematic">cinematic</option>
-                    <option value="3d-model">3d-model</option>
-                    <option value="pixel-art">pixel-art</option>
-                    <option value="tile-texture">tile-texture</option>
+                    <option value="enhance" {{ 'selected' if session.get('style_preset') == 'enhance' else '' }}>enhance</option>
+                    <option value="anime" {{ 'selected' if session.get('style_preset') == 'anime' else '' }}>anime</option>
+                    <option value="photographic" {{ 'selected' if session.get('style_preset') == 'photographic' else '' }}>photographic</option>
+                    <option value="digital-art" {{ 'selected' if session.get('style_preset') == 'digital-art' else '' }}>digital-art</option>
+                    <option value="comic-book" {{ 'selected' if session.get('style_preset') == 'comic-book' else '' }}>comic-book</option>
+                    <option value="fantasy-art" {{ 'selected' if session.get('style_preset') == 'fantasy-art' else '' }}>fantasy-art</option>
+                    <option value="line-art" {{ 'selected' if session.get('style_preset') == 'line-art' else '' }}>line-art</option>
+                    <option value="analog-film" {{ 'selected' if session.get('style_preset') == 'analog-film' else '' }}>analog-film</option>
+                    <option value="neon-punk" {{ 'selected' if session.get('style_preset') == 'neon-punk' else '' }}>neon-punk</option>
+                    <option value="isometric" {{ 'selected' if session.get('style_preset') == 'isometric' else '' }}>isometric</option>
+                    <option value="low-poly" {{ 'selected' if session.get('style_preset') == 'low-poly' else '' }}>low-poly</option>
+                    <option value="origami" {{ 'selected' if session.get('style_preset') == 'origami' else '' }}>origami</option>
+                    <option value="modeling-compound" {{ 'selected' if session.get('style_preset') == 'modeling-compound' else '' }}>modeling-compound</option>
+                    <option value="cinematic" {{ 'selected' if session.get('style_preset') == 'cinematic' else '' }}>cinematic</option>
+                    <option value="3d-model" {{ 'selected' if session.get('style_preset') == '3d-model' else '' }}>3d-model</option>
+                    <option value="pixel-art" {{ 'selected' if session.get('style_preset') == 'pixel-art' else '' }}>pixel-art</option>
+                    <option value="tile-texture" {{ 'selected' if session.get('style_preset') == 'tile-texture' else '' }}>tile-texture</option>
                 </select><br>
             </div>
             <div class="form-group">
                 <label for="model">モデル:</label><br>
                 <select id="model" name="model">
-                    <option value="sd3">sd3</option>
-                    <option value="sd3-turbo">sd3-turbo</option>
+                    <option value="sd3" {{ 'selected' if session.get('model') == 'sd3' else '' }}>sd3</option>
+                    <option value="sd3-turbo" {{ 'selected' if session.get('model') == 'sd3-turbo' else '' }}>sd3-turbo</option>
                 </select><br>
             </div>
             <div class="form-group">
                 <label for="seed">シード（任意）:</label><br>
-                <input type="text" id="seed" name="seed" placeholder="任意のシード値を入力してください"><br>
+                <input type="text" id="seed" name="seed" placeholder="任意のシード値を入力してください" value="{{ session.get('seed', '') }}"><br>
             </div>
             <button type="submit" class="generate-button">画像生成</button>
         </form>

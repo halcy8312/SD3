@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_file, session, redirect, url_for
+from flask import Flask, request, render_template, send_file, session, redirect, url_for, flash
 import os
 import requests
 import random
@@ -49,6 +49,12 @@ def get_unique_filename(extension):
 def index():
     if request.method == 'POST':
         session['api_key'] = request.form['api_key']
+        session['prompt'] = request.form['prompt']
+        session['negative_prompt'] = request.form['negative_prompt']
+        session['aspect_ratio'] = request.form['aspect_ratio']
+        session['style_preset'] = request.form['style_preset']
+        session['model'] = request.form['model']
+        session['seed'] = request.form['seed']
         return redirect(url_for('generate'))
     return render_template('index.html')
 
@@ -59,20 +65,26 @@ def generate():
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        prompt = request.form['prompt']
-        negative_prompt = request.form['negative_prompt']
-        aspect_ratio = request.form['aspect_ratio']
-        style_preset = request.form['style_preset']
-        model = request.form['model']
-        seed = request.form.get('seed')
+        prompt = session.get('prompt')
+        negative_prompt = session.get('negative_prompt')
+        aspect_ratio = session.get('aspect_ratio')
+        style_preset = session.get('style_preset')
+        model = session.get('model')
+        seed = session.get('seed')
         seed = int(seed) if seed else None
 
         try:
             image_path = generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key, model, seed)
-            return send_file(image_path, mimetype='image/png')
+            return render_template('result.html', image_path=image_path)
         except Exception as e:
-            return str(e)
+            flash(str(e))
+            return redirect(url_for('index'))
+
     return render_template('generate.html')
+
+@app.route('/back', methods=['POST'])
+def back():
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run()
