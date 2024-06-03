@@ -64,8 +64,13 @@ button.generate-button {
     padding: 10px 15px;
     cursor: pointer;
     float: right;
+    border-radius: 8px; /* 角を丸くする */
 }
 
 button.generate-button:hover {
     background: #0056b3;
+}
+
+.button-group {
+    margin-top: -20px; /* 調整したい高さに応じてマイナスの値を変更 */
 }
