@@ -29,6 +29,10 @@ body {
     top: 50px;
 }
 
+.navbar .dropdown-content.show {
+    display: block;
+}
+
 .navbar .dropdown-content a {
     float: none;
     color: black;
@@ -40,10 +44,6 @@ body {
 
 .navbar .dropdown-content a:hover {
     background-color: #ddd;
-}
-
-.navbar .dropdown-content.show {
-    display: block;
 }
 
 .content {
