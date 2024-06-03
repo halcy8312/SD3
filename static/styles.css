@@ -72,5 +72,5 @@ button.generate-button:hover {
 }
 
 .button-group {
-    margin-top: -20px; /* 調整したい高さに応じてマイナスの値を変更 */
+    margin-top: -100px; /* 調整したい高さに応じてマイナスの値を変更 */
 }
