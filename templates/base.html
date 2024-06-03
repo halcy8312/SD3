@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="navbar">
-        <button class="dropbtn" onclick="toggleMenu()">メニュー</button>
+        <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
         <div class="dropdown-content" id="dropdownMenu">
             <a href="{{ url_for('generate') }}">画像生成</a>
             <a href="{{ url_for('upscale') }}">アップスケール</a>

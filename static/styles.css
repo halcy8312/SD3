@@ -11,16 +11,11 @@ body {
     position: relative;
 }
 
-.navbar .dropbtn {
-    font-size: 16px;
-    border: none;
-    outline: none;
+.menu-icon {
+    font-size: 30px;
+    cursor: pointer;
     color: white;
     padding: 14px 16px;
-    background-color: inherit;
-    font-family: inherit;
-    margin: 0;
-    cursor: pointer;
 }
 
 .navbar .dropdown-content {
