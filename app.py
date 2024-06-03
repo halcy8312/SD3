@@ -41,7 +41,13 @@ def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key,
         raise Exception(f"An unexpected error occurred: {err}")
 
 def upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed=None, output_format="png"):
-    url = f"https://api.stability.ai/v2beta/upscale/{upscale_type}"
+    if upscale_type == "conservative":
+        url = "https://api.stability.ai/v2beta/upscale/conservative"
+    elif upscale_type == "creative":
+        url = "https://api.stability.ai/v2beta/upscale/creative/start"
+    else:
+        raise ValueError("Invalid upscale type")
+
     headers = {
         "Authorization": f"Bearer {api_key}",
         "accept": "image/*"
