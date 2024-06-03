@@ -10,8 +10,9 @@ body {
     background-color: #333;
     padding: 10px;
     display: flex;
-    justify-content: space-around;
-    flex-wrap: nowrap; /* 子要素を横並びにする */
+    justify-content: space-between; /* 項目間のスペースを調整 */
+    flex-wrap: nowrap; /* 子要素を横並びに保つ */
+    overflow-x: auto; /* 横スクロールを許可 */
 }
 
 .nav-button {
@@ -76,4 +77,17 @@ button.generate-button:hover {
 
 .button-group {
     margin-top: -20px; /* 調整したい高さに応じてマイナスの値を変更 */
+}
+
+/* メディアクエリを追加して、小さな画面ではハンバーガーメニューに変更 */
+@media (max-width: 600px) {
+    .navbar {
+        flex-direction: column; /* 縦並びに変更 */
+        align-items: flex-start;
+    }
+
+    .nav-button {
+        padding: 10px;
+        width: 100%; /* 横幅いっぱいに広げる */
+    }
 }
