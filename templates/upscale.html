@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}アップスケール{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>画像アップスケール</h1>
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="image">画像ファイル:</label><br>
+            <input type="file" id="image" name="image" accept="image/*" required><br>
+        </div>
+        <div class="form-group">
+            <label for="prompt">プロンプト:</label><br>
+            <textarea id="prompt" name="prompt" rows="3" placeholder="プロンプトをカンマで区切って入力してください"></textarea><br>
+        </div>
+        <div class="form-group">
+            <label for="negative_prompt">ネガティブプロンプト:</label><br>
+            <textarea id="negative_prompt" name="negative_prompt" rows="3" placeholder="ネガティブプロンプトをカンマで区切って入力してください"></textarea><br>
+        </div>
+        <div class="form-group">
+            <label for="upscale_type">アップスケールタイプ:</label><br>
+            <select id="upscale_type" name="upscale_type">
+                <option value="conservative">保守的</option>
+                <option value="creative">創造的</option>
+            </select><br>
+        </div>
+        <div class="form-group">
+            <label for="output_format">出力フォーマット:</label><br>
+            <select id="output_format" name="output_format">
+                <option value="png">PNG</option>
+                <option value="jpeg">JPEG</option>
+                <option value="webp">WEBP</option>
+            </select><br>
+        </div>
+        <div class="form-group">
+            <label for="seed">シード（任意）:</label><br>
+            <input type="text" id="seed" name="seed" placeholder="任意のシード値を入力してください"><br>
+        </div>
+        <button type="submit" class="generate-button">アップスケール</button>
+    </form>
+</div>
+{% endblock %}

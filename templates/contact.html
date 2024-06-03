@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}お問い合わせ{% endblock %}
+
+{% block content %}
+<h1>お問い合わせ</h1>
+<form method="post">
+    <label for="name">名前:</label><br>
+    <input type="text" id="name" name="name" required><br>
+    <label for="email">メールアドレス:</label><br>
+    <input type="email" id="email" name="email" required><br>
+    <label for="message">メッセージ:</label><br>
+    <textarea id="message" name="message" rows="5" required></textarea><br>
+    <button type="submit">送信</button>
+</form>
+{% endblock %}

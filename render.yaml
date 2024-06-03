@@ -9,3 +9,4 @@ services:
         value: 0f8f4a8b6737b929a0ce1f75fde9c281
       # - key: STABILITY_API_KEY
       #   value: your_stability_api_key_here
+  

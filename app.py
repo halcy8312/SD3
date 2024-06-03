@@ -1,7 +1,6 @@
 from flask import Flask, request, render_template, send_file, session, redirect, url_for
 import os
 import requests
-import random
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.getenv('SECRET_KEY', 'supersecretkey')  # 環境変数からシークレットキーを取得
@@ -19,6 +18,37 @@ def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key,
         "style_preset": (None, style_preset),
         "output_format": (None, output_format),
     }
+    if seed is not None:
+        files["seed"] = (None, str(seed))
+
+    response = requests.post(url, headers=headers, files=files)
+    
+    if response.status_code == 200:
+        file_name = get_unique_filename(output_format)
+        file_path = f"{file_name}.{output_format}"
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
+        return file_path
+    else:
+        try:
+            error_message = response.json()
+        except ValueError:
+            error_message = response.text
+        raise Exception(f"Error: {response.status_code}, Response: {error_message}")
+
+def upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed=None, output_format="png"):
+    url = f"https://api.stability.ai/v2beta/upscale/{upscale_type}"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "accept": "image/*"
+    }
+    files = {
+        "image": image,
+        "prompt": (None, prompt),
+        "output_format": (None, output_format),
+    }
+    if negative_prompt:
+        files["negative_prompt"] = (None, negative_prompt)
     if seed is not None:
         files["seed"] = (None, str(seed))
 
@@ -73,6 +103,43 @@ def generate():
         except Exception as e:
             return str(e)
     return render_template('generate.html')
+
+@app.route('/upscale', methods=['GET', 'POST'])
+def upscale():
+    api_key = session.get('api_key')
+    if not api_key:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        image = request.files['image']
+        prompt = request.form['prompt']
+        negative_prompt = request.form['negative_prompt']
+        upscale_type = request.form['upscale_type']
+        output_format = request.form['output_format']
+        seed = request.form.get('seed')
+        seed = int(seed) if seed else None
+
+        try:
+            image_path = upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed, output_format)
+            return send_file(image_path, mimetype=f'image/{output_format}')
+        except Exception as e:
+            return str(e)
+    return render_template('upscale.html')
+
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        # お問い合わせ処理
+        pass
+    return render_template('contact.html')
+
+@app.route('/privacy_policy')
+def privacy_policy():
+    return render_template('privacy_policy.html')
+
+@app.route('/terms_of_service')
+def terms_of_service():
+    return render_template('terms_of_service.html')
 
 if __name__ == '__main__':
     app.run()
