@@ -42,6 +42,10 @@ body {
     background-color: #ddd;
 }
 
+.navbar .dropdown-content.show {
+    display: block;
+}
+
 .content {
     max-width: 800px;
     margin: 0 auto;
