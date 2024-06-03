@@ -11,6 +11,7 @@ body {
     padding: 10px;
     display: flex;
     justify-content: space-around;
+    flex-wrap: nowrap; /* 子要素を横並びにする */
 }
 
 .nav-button {
@@ -19,8 +20,9 @@ body {
     padding: 14px 16px;
     text-decoration: none;
     display: inline-block;
-    font-size: 8px; /* 文字サイズを16pxから18pxに変更 */
+    font-size: 10px;
     cursor: pointer;
+    white-space: nowrap; /* テキストを折り返さないようにする */
 }
 
 .nav-button:hover {
