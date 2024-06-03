@@ -21,20 +21,25 @@ def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key,
     if seed is not None:
         files["seed"] = (None, str(seed))
 
-    response = requests.post(url, headers=headers, files=files)
-    
-    if response.status_code == 200:
+    try:
+        response = requests.post(url, headers=headers, files=files)
+        response.raise_for_status()
         file_name = get_unique_filename(output_format)
         file_path = f"{file_name}.{output_format}"
         with open(file_path, 'wb') as file:
             file.write(response.content)
         return file_path
-    else:
+    except requests.exceptions.HTTPError as http_err:
         try:
             error_message = response.json()
         except ValueError:
             error_message = response.text
+        print(f"HTTP error occurred: {http_err}, Response: {error_message}")
         raise Exception(f"Error: {response.status_code}, Response: {error_message}")
+    except Exception as err:
+        print(f"An error occurred: {err}")
+        raise Exception(f"An unexpected error occurred: {err}")
+
 
 def upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed=None, output_format="png"):
     url = f"https://api.stability.ai/v2beta/upscale/{upscale_type}"

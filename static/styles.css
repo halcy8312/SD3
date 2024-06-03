@@ -45,10 +45,6 @@ body {
     background-color: #ddd;
 }
 
-.navbar:hover .dropdown-content {
-    display: block;
-}
-
 .content {
     max-width: 800px;
     margin: 0 auto;
@@ -56,17 +52,6 @@ body {
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.footer {
-    text-align: center;
-    padding: 10px;
-    background: #333;
-    color: white;
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
 }
 
 .form-group {

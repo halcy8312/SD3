@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 <body>
     <div class="navbar">
-        <button class="dropbtn">メニュー</button>
-        <div class="dropdown-content">
+        <button class="dropbtn" onclick="toggleMenu()">メニュー</button>
+        <div class="dropdown-content" id="dropdownMenu">
             <a href="{{ url_for('generate') }}">画像生成</a>
             <a href="{{ url_for('upscale') }}">アップスケール</a>
             <a href="{{ url_for('index') }}">API入力</a>
@@ -20,11 +21,6 @@
     </div>
     <div class="content">
         {% block content %}{% endblock %}
-    </div>
-    <div class="footer">
-        <a href="{{ url_for('contact') }}">お問い合わせ</a> | 
-        <a href="{{ url_for('privacy_policy') }}">プライバシーポリシー</a> | 
-        <a href="{{ url_for('terms_of_service') }}">利用規約</a>
     </div>
 </body>
 </html>
