@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, send_file, session, redirect, url_for
 import os
 import requests
+import time
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.getenv('SECRET_KEY', 'supersecretkey')
@@ -65,44 +66,15 @@ def upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed=No
     try:
         response = requests.post(url, headers=headers, files=files)
         response.raise_for_status()
-        file_name = get_unique_filename(output_format)
-        file_path = f"{file_name}.{output_format}"
-        with open(file_path, 'wb') as file:
-            file.write(response.content)
-        return file_path
-    except requests.exceptions.HTTPError as http_err:
-        try:
-            error_message = response.json()
-        except ValueError:
-            error_message = response.text
-        print(f"HTTP error occurred: {http_err}, Response: {error_message}")
-        raise Exception(f"Error: {response.status_code}, Response: {error_message}")
-    except Exception as err:
-        print(f"An error occurred: {err}")
-        raise Exception(f"An unexpected error occurred: {err}")
-
-def start_creative_upscale(image, prompt, negative_prompt, api_key, seed=None, output_format="png", creativity=0.3):
-    url = "https://api.stability.ai/v2beta/stable-image/upscale/creative"
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "accept": "application/json"
-    }
-    files = {
-        "image": image,
-        "prompt": (None, prompt),
-        "output_format": (None, output_format),
-    }
-    if negative_prompt:
-        files["negative_prompt"] = (None, negative_prompt)
-    if seed is not None:
-        files["seed"] = (None, str(seed))
-    if creativity is not None:
-        files["creativity"] = (None, str(creativity))
-
-    try:
-        response = requests.post(url, headers=headers, files=files)
-        response.raise_for_status()
-        return response.json()["id"]
+        if upscale_type == "conservative":
+            file_name = get_unique_filename(output_format)
+            file_path = f"{file_name}.{output_format}"
+            with open(file_path, 'wb') as file:
+                file.write(response.content)
+            return file_path
+        else:
+            upscale_id = response.json()["id"]
+            return fetch_creative_upscale_result(upscale_id, api_key, output_format)
     except requests.exceptions.HTTPError as http_err:
         try:
             error_message = response.json()
@@ -121,24 +93,29 @@ def fetch_creative_upscale_result(upscale_id, api_key, output_format="png"):
         "accept": "image/*"
     }
 
-    try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        file_name = get_unique_filename(output_format)
-        file_path = f"{file_name}.{output_format}"
-        with open(file_path, 'wb') as file:
-            file.write(response.content)
-        return file_path
-    except requests.exceptions.HTTPError as http_err:
+    for _ in range(10):
         try:
-            error_message = response.json()
-        except ValueError:
-            error_message = response.text
-        print(f"HTTP error occurred: {http_err}, Response: {error_message}")
-        raise Exception(f"Error: {response.status_code}, Response: {error_message}")
-    except Exception as err:
-        print(f"An error occurred: {err}")
-        raise Exception(f"An unexpected error occurred: {err}")
+            response = requests.get(url, headers=headers)
+            if response.status_code == 202:
+                print("Generation in-progress, trying again in 10 seconds.")
+                time.sleep(10)
+            else:
+                response.raise_for_status()
+                file_name = get_unique_filename(output_format)
+                file_path = f"{file_name}.{output_format}"
+                with open(file_path, 'wb') as file:
+                    file.write(response.content)
+                return file_path
+        except requests.exceptions.HTTPError as http_err:
+            try:
+                error_message = response.json()
+            except ValueError:
+                error_message = response.text
+            print(f"HTTP error occurred: {http_err}, Response: {error_message}")
+            raise Exception(f"Error: {response.status_code}, Response: {error_message}")
+        except Exception as err:
+            print(f"An error occurred: {err}")
+            raise Exception(f"An unexpected error occurred: {err}")
 
 def get_unique_filename(extension):
     i = 1
@@ -195,13 +172,8 @@ def upscale():
         creativity = float(creativity) if creativity else 0.3
 
         try:
-            if upscale_type == "conservative":
-                image_path = upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed, output_format)
-                return send_file(image_path, mimetype=f'image/{output_format}')
-            elif upscale_type == "creative":
-                upscale_id = start_creative_upscale(image, prompt, negative_prompt, api_key, seed, output_format, creativity)
-                image_path = fetch_creative_upscale_result(upscale_id, api_key, output_format)
-                return send_file(image_path, mimetype=f'image/{output_format}')
+            image_path = upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed, output_format)
+            return send_file(image_path, mimetype=f'image/{output_format}')
         except Exception as e:
             return str(e)
     return render_template('upscale.html')
