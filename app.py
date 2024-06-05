@@ -40,6 +40,47 @@ def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key,
         print(f"An error occurred: {err}")
         raise Exception(f"An unexpected error occurred: {err}")
 
+def upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed=None, output_format="png"):
+    if upscale_type == "conservative":
+        url = "https://api.stability.ai/v2beta/stable-image/upscale/conservative"
+    elif upscale_type == "creative":
+        url = "https://api.stability.ai/v2beta/stable-image/upscale/creative"
+    else:
+        raise ValueError("Invalid upscale type")
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "accept": "image/*"
+    }
+    files = {
+        "image": image,
+        "prompt": (None, prompt),
+        "output_format": (None, output_format),
+    }
+    if negative_prompt:
+        files["negative_prompt"] = (None, negative_prompt)
+    if seed is not None:
+        files["seed"] = (None, str(seed))
+
+    try:
+        response = requests.post(url, headers=headers, files=files)
+        response.raise_for_status()
+        file_name = get_unique_filename(output_format)
+        file_path = f"{file_name}.{output_format}"
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
+        return file_path
+    except requests.exceptions.HTTPError as http_err:
+        try:
+            error_message = response.json()
+        except ValueError:
+            error_message = response.text
+        print(f"HTTP error occurred: {http_err}, Response: {error_message}")
+        raise Exception(f"Error: {response.status_code}, Response: {error_message}")
+    except Exception as err:
+        print(f"An error occurred: {err}")
+        raise Exception(f"An unexpected error occurred: {err}")
+
 def start_creative_upscale(image, prompt, negative_prompt, api_key, seed=None, output_format="png", creativity=0.3):
     url = "https://api.stability.ai/v2beta/stable-image/upscale/creative"
     headers = {
