@@ -41,7 +41,7 @@ def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key,
         print(f"An error occurred: {err}")
         raise Exception(f"An unexpected error occurred: {err}")
 
-def upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed=None, output_format="png"):
+def upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed=None, output_format="png", creativity=0.3):
     if upscale_type == "conservative":
         url = "https://api.stability.ai/v2beta/stable-image/upscale/conservative"
     elif upscale_type == "creative":
@@ -57,6 +57,7 @@ def upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed=No
         "image": image,
         "prompt": (None, prompt),
         "output_format": (None, output_format),
+        "creativity": (None, str(creativity))
     }
     if negative_prompt:
         files["negative_prompt"] = (None, negative_prompt)
@@ -172,7 +173,7 @@ def upscale():
         creativity = float(creativity) if creativity else 0.3
 
         try:
-            image_path = upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed, output_format)
+            image_path = upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed, output_format, creativity)
             return send_file(image_path, mimetype=f'image/{output_format}')
         except Exception as e:
             return str(e)
