@@ -3,7 +3,7 @@ import os
 import requests
 
 app = Flask(__name__, static_url_path='/static')
-app.secret_key = os.getenv('SECRET_KEY', 'supersecretkey')  # 環境変数からシークレットキーを取得
+app.secret_key = os.getenv('SECRET_KEY', 'supersecretkey')
 
 def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key, model, seed=None, output_format="png"):
     url = f"https://api.stability.ai/v2beta/stable-image/generate/{model}"
@@ -40,17 +40,11 @@ def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key,
         print(f"An error occurred: {err}")
         raise Exception(f"An unexpected error occurred: {err}")
 
-def upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed=None, output_format="png"):
-    if upscale_type == "conservative":
-        url = "https://api.stability.ai/v2beta/stable-image/upscale/conservative"
-    elif upscale_type == "creative":
-        url = "https://api.stability.ai/v2beta/stable-image/upscale/creative"
-    else:
-        raise ValueError("Invalid upscale type")
-
+def start_creative_upscale(image, prompt, negative_prompt, api_key, seed=None, output_format="png", creativity=0.3):
+    url = "https://api.stability.ai/v2beta/stable-image/upscale/creative"
     headers = {
         "Authorization": f"Bearer {api_key}",
-        "accept": "image/*"
+        "accept": "application/json"
     }
     files = {
         "image": image,
@@ -61,9 +55,33 @@ def upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed=No
         files["negative_prompt"] = (None, negative_prompt)
     if seed is not None:
         files["seed"] = (None, str(seed))
+    if creativity is not None:
+        files["creativity"] = (None, str(creativity))
 
     try:
         response = requests.post(url, headers=headers, files=files)
+        response.raise_for_status()
+        return response.json()["id"]
+    except requests.exceptions.HTTPError as http_err:
+        try:
+            error_message = response.json()
+        except ValueError:
+            error_message = response.text
+        print(f"HTTP error occurred: {http_err}, Response: {error_message}")
+        raise Exception(f"Error: {response.status_code}, Response: {error_message}")
+    except Exception as err:
+        print(f"An error occurred: {err}")
+        raise Exception(f"An unexpected error occurred: {err}")
+
+def fetch_creative_upscale_result(upscale_id, api_key, output_format="png"):
+    url = f"https://api.stability.ai/v2beta/stable-image/upscale/creative/result/{upscale_id}"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "accept": "image/*"
+    }
+
+    try:
+        response = requests.get(url, headers=headers)
         response.raise_for_status()
         file_name = get_unique_filename(output_format)
         file_path = f"{file_name}.{output_format}"
@@ -132,10 +150,17 @@ def upscale():
         output_format = request.form['output_format']
         seed = request.form.get('seed')
         seed = int(seed) if seed else None
+        creativity = request.form.get('creativity')
+        creativity = float(creativity) if creativity else 0.3
 
         try:
-            image_path = upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed, output_format)
-            return send_file(image_path, mimetype=f'image/{output_format}')
+            if upscale_type == "conservative":
+                image_path = upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed, output_format)
+                return send_file(image_path, mimetype=f'image/{output_format}')
+            elif upscale_type == "creative":
+                upscale_id = start_creative_upscale(image, prompt, negative_prompt, api_key, seed, output_format, creativity)
+                image_path = fetch_creative_upscale_result(upscale_id, api_key, output_format)
+                return send_file(image_path, mimetype=f'image/{output_format}')
         except Exception as e:
             return str(e)
     return render_template('upscale.html')
