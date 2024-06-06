@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, send_file, session, redirect,
 import os
 import requests
 import time
+import base64
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.getenv('SECRET_KEY', 'supersecretkey')
@@ -153,6 +154,44 @@ def fetch_creative_upscale_result(upscale_id, api_key, output_format="png"):
             print(f"An error occurred: {err}")
             raise Exception(f"An unexpected error occurred: {err}")
 
+def edit_image(image, mask, api_key, seed=None, output_format="png"):
+    url = "https://api.stability.ai/v2beta/stable-image/edit/erase"
+    
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "accept": "image/*"
+    }
+    files = {
+        "image": image,
+    }
+    if mask:
+        mask_data = base64.b64decode(mask.split(',')[1])
+        files["mask"] = ('mask.png', mask_data)
+    data = {
+        "output_format": output_format
+    }
+    if seed is not None:
+        data["seed"] = str(seed)
+
+    try:
+        response = requests.post(url, headers=headers, files=files, data=data)
+        response.raise_for_status()
+        file_name = get_unique_filename(output_format)
+        file_path = f"static/{file_name}.{output_format}"
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
+        return file_path
+    except requests.exceptions.HTTPError as http_err:
+        try:
+            error_message = response.json()
+        except ValueError:
+            error_message = response.text
+        print(f"HTTP error occurred: {http_err}, Response: {error_message}")
+        raise Exception(f"Error: {response.status_code}, Response: {error_message}")
+    except Exception as err:
+        print(f"An error occurred: {err}")
+        raise Exception(f"An unexpected error occurred: {err}")
+
 def get_unique_filename(extension):
     i = 1
     while True:
@@ -223,6 +262,33 @@ def upscale():
         except Exception as e:
             return str(e)
     return render_template('upscale.html', credits=session.get('credits'))
+
+@app.route('/edit', methods=['GET', 'POST'])
+def edit():
+    api_key = session.get('api_key')
+    if not api_key:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        image = request.files['image']
+        mask = request.form.get('mask')
+        output_format = request.form.get('output_format', 'png')
+        seed = request.form.get('seed')
+        seed = int(seed) if seed else None
+
+        try:
+            image_path = edit_image(image, mask, api_key, seed, output_format)
+            image_filename = os.path.basename(image_path)
+            session['credits'] = get_credits(api_key)
+            return redirect(url_for('edited', image_filename=image_filename))
+        except Exception as e:
+            return str(e)
+    return render_template('edit.html', credits=session.get('credits'))
+
+@app.route('/edited')
+def edited():
+    image_filename = request.args.get('image_filename')
+    return render_template('edited.html', image_filename=image_filename)
 
 @app.route('/generated')
 def generated():

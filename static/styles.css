@@ -157,3 +157,26 @@ button.generate-button:hover {
     display: block;
     text-align: right;
 }
+
+.tools {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-around;
+}
+
+#pen-size, #eraser-size {
+    width: 100px;
+}
+
+button#reset-button, button#save-button {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+button#reset-button:hover, button#save-button:hover {
+    background: #0056b3;
+}
