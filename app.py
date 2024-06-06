@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_file, session, redirect, url_for
+from flask import Flask, request, render_template, send_file, session, redirect, url_for, jsonify
 import os
 import requests
 import time
@@ -289,6 +289,19 @@ def edit():
 def edited():
     image_filename = request.args.get('image_filename')
     return render_template('edited.html', image_filename=image_filename)
+
+@app.route('/get_credits', methods=['POST'])
+def fetch_credits():
+    api_key = session.get('api_key')
+    if not api_key:
+        return jsonify({"error": "API key is missing"}), 400
+
+    credits = get_credits(api_key)
+    if credits is not None:
+        session['credits'] = credits
+        return jsonify({"credits": credits}), 200
+    else:
+        return jsonify({"error": "Failed to fetch credits"}), 500
 
 @app.route('/generated')
 def generated():

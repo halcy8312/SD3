@@ -10,7 +10,7 @@
         <h2>残りクレジット: {{ credits }}</h2>
     </div>
     {% endif %}
-    <form method="post">
+    <form method="post" id="generate-form">
         <div class="form-group">
             <label for="prompt">プロンプト:</label><br>
             <textarea id="prompt" name="prompt" rows="3" placeholder="プロンプトをカンマで区切って入力してください" oninput="updateCharacterCount('prompt', 'prompt-char-count')"></textarea><br>

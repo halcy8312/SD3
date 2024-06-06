@@ -35,6 +35,13 @@ document.getElementById('image').addEventListener('change', function(event) {
         img.onload = function() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+            
+            // 画像のサイズに合わせてキャンバスのサイズを調整
+            canvas.width = img.width;
+            canvas.height = img.height;
+            maskCanvas.width = img.width;
+            maskCanvas.height = img.height;
+            
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         }
         img.src = reader.result;
@@ -69,6 +76,18 @@ document.getElementById('save-button').addEventListener('click', function() {
     document.getElementById('edit-form').submit();
 });
 
+document.getElementById('pen-button').addEventListener('click', function() {
+    tool = 'pen';
+    document.getElementById('pen-button').classList.add('active');
+    document.getElementById('eraser-button').classList.remove('active');
+});
+
+document.getElementById('eraser-button').addEventListener('click', function() {
+    tool = 'eraser';
+    document.getElementById('pen-button').classList.remove('active');
+    document.getElementById('eraser-button').classList.add('active');
+});
+
 function startPosition(event) {
     painting = true;
     draw(event);
@@ -100,3 +119,25 @@ function draw(event) {
     maskCtx.beginPath();
     maskCtx.moveTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
 }
+
+function updateCredits(apiKey) {
+    fetch('/get_credits', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('credit-info').innerText = `残りクレジット: ${data.credits}`;
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// 画像生成後にクレジットを更新
+document.getElementById('generate-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    // 画像生成処理...
+    updateCredits(apiKey);
+});
