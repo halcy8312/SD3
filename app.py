@@ -42,18 +42,18 @@ def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key,
         "Authorization": f"Bearer {api_key}",
         "accept": "image/*"
     }
-    data = {
-        "prompt": prompt,
-        "negative_prompt": negative_prompt,
-        "aspect_ratio": aspect_ratio,
-        "style_preset": style_preset,
-        "output_format": output_format,
+    files = {
+        "prompt": (None, prompt),
+        "negative_prompt": (None, negative_prompt),
+        "aspect_ratio": (None, aspect_ratio),
+        "style_preset": (None, style_preset),
+        "output_format": (None, output_format),
     }
     if seed is not None:
-        data["seed"] = str(seed)
+        files["seed"] = (None, str(seed))
 
     try:
-        response = requests.post(url, headers=headers, data=data)
+        response = requests.post(url, headers=headers, files=files)
         response.raise_for_status()
         file_name = get_unique_filename(output_format)
         file_path = f"static/{file_name}.{output_format}"
@@ -169,8 +169,9 @@ def index():
         api_key = session['api_key']
         credits = get_credits(api_key)
         account_info = get_account_info(api_key)
+        session['credits'] = credits
         return render_template('index.html', credits=credits, account_info=account_info)
-    return render_template('index.html', credits=credits, account_info=account_info)
+    return render_template('index.html', credits=session.get('credits'), account_info=account_info)
 
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
@@ -190,6 +191,7 @@ def generate():
         try:
             image_path = generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key, model, seed)
             image_filename = os.path.basename(image_path)
+            session['credits'] = get_credits(api_key)
             return redirect(url_for('generated', image_filename=image_filename))
         except Exception as e:
             return str(e)
@@ -215,6 +217,7 @@ def upscale():
         try:
             image_path = upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed, output_format, creativity)
             image_filename = os.path.basename(image_path)
+            session['credits'] = get_credits(api_key)
             return redirect(url_for('upscaled', image_filename=image_filename))
         except Exception as e:
             return str(e)
