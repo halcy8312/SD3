@@ -313,6 +313,10 @@ def upscaled():
     image_filename = request.args.get('image_filename')
     return render_template('upscaled.html', image_filename=image_filename)
 
+@app.route('/canvas')
+def canvas():
+    return render_template('canvas.html')
+
 @app.route('/download_image/<filename>')
 def download_image(filename):
     return send_file(f'static/{filename}', as_attachment=True)

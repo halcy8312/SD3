@@ -1,4 +1,4 @@
-// script.js
+　// script.js
 
 function toggleMenu() {
     var menu = document.getElementById("dropdownMenu");
