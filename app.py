@@ -42,18 +42,18 @@ def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key,
         "Authorization": f"Bearer {api_key}",
         "accept": "image/*"
     }
-    files = {
-        "prompt": (None, prompt),
-        "negative_prompt": (None, negative_prompt),
-        "aspect_ratio": (None, aspect_ratio),
-        "style_preset": (None, style_preset),
-        "output_format": (None, output_format),
+    data = {
+        "prompt": prompt,
+        "negative_prompt": negative_prompt,
+        "aspect_ratio": aspect_ratio,
+        "style_preset": style_preset,
+        "output_format": output_format,
     }
     if seed is not None:
-        files["seed"] = (None, str(seed))
+        data["seed"] = str(seed)
 
     try:
-        response = requests.post(url, headers=headers, files=files)
+        response = requests.post(url, headers=headers, data=data)
         response.raise_for_status()
         file_name = get_unique_filename(output_format)
         file_path = f"static/{file_name}.{output_format}"
