@@ -5,6 +5,11 @@
 {% block content %}
 <div class="container">
     <h1>画像生成</h1>
+    {% if credits is not none %}
+    <div class="credit-info">
+        <h2>残りクレジット: {{ credits }}</h2>
+    </div>
+    {% endif %}
     <form method="post">
         <div class="form-group">
             <label for="prompt">プロンプト:</label><br>

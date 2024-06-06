@@ -33,8 +33,10 @@ def get_account_info(api_key):
 def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key, model, seed=None, output_format="png"):
     if model == "ultra":
         url = "https://api.stability.ai/v2beta/stable-image/generate/ultra"
-    else:
-        url = f"https://api.stability.ai/v2beta/stable-image/generate/{model}"
+    elif model == "sd3":
+        url = "https://api.stability.ai/v2beta/stable-image/generate/sd3"
+    elif model == "sd3-turbo":
+        url = "https://api.stability.ai/v2beta/stable-image/generate/sd3-turbo"
     
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -191,7 +193,7 @@ def generate():
             return redirect(url_for('generated', image_filename=image_filename))
         except Exception as e:
             return str(e)
-    return render_template('generate.html')
+    return render_template('generate.html', credits=session.get('credits'))
 
 @app.route('/upscale', methods=['GET', 'POST'])
 def upscale():
@@ -216,7 +218,7 @@ def upscale():
             return redirect(url_for('upscaled', image_filename=image_filename))
         except Exception as e:
             return str(e)
-    return render_template('upscale.html')
+    return render_template('upscale.html', credits=session.get('credits'))
 
 @app.route('/generated')
 def generated():

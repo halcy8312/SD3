@@ -108,6 +108,7 @@ button.generate-button:hover {
     background: #0056b3;
 }
 
+　/* styles.css */
 .credit-info {
     padding: 10px;
     background-color: #e7f3fe;
@@ -137,4 +138,14 @@ button.generate-button:hover {
 .account-info img {
     max-width: 100px;
     border-radius: 50%;
+}
+
+.credits {
+    padding: 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    color: #333;
+    border-radius: 4px;
+    margin-left: 10px;
+    display: inline-block;
 }
