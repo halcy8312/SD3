@@ -48,6 +48,7 @@ def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key,
         "aspect_ratio": (None, aspect_ratio),
         "style_preset": (None, style_preset),
         "output_format": (None, output_format),
+        "model": (None, model)
     }
     if seed is not None:
         files["seed"] = (None, str(seed))
