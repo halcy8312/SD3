@@ -1,4 +1,4 @@
-　// script.js
+// script.js
 
 function toggleMenu() {
     var menu = document.getElementById("dropdownMenu");
@@ -73,6 +73,7 @@ document.getElementById('reset-button').addEventListener('click', function() {
 
 document.getElementById('save-button').addEventListener('click', function() {
     document.getElementById('mask').value = maskCanvas.toDataURL();
+    document.getElementById('uploaded_image').value = canvas.toDataURL();
     document.getElementById('edit-form').submit();
 });
 
