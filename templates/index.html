@@ -9,4 +9,17 @@
     <input type="text" id="api_key" name="api_key" required><br>
     <button type="submit">送信</button>
 </form>
+{% if credits is not none %}
+    <div class="credit-info">
+        <h2>残りクレジット: {{ credits }}</h2>
+    </div>
+{% endif %}
+{% if account_info is not none %}
+    <div class="account-info">
+        <h2>アカウント情報</h2>
+        <p>メール: {{ account_info.email }}</p>
+        <p>ID: {{ account_info.id }}</p>
+        <p>プロフィール画像: <img src="{{ account_info.profile_image }}" alt="プロフィール画像"></p>
+    </div>
+{% endif %}
 {% endblock %}

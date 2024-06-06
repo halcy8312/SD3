@@ -107,3 +107,34 @@ button.generate-button:hover {
 .download-button:hover, .back-button:hover {
     background: #0056b3;
 }
+
+.credit-info {
+    padding: 10px;
+    background-color: #e7f3fe;
+    border: 1px solid #b3e5fc;
+    color: #333;
+    margin-top: 20px;
+    border-radius: 4px;
+}
+
+.account-info {
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    color: #333;
+    margin-top: 20px;
+    border-radius: 4px;
+}
+
+.account-info h2 {
+    margin-top: 0;
+}
+
+.account-info p {
+    margin: 5px 0;
+}
+
+.account-info img {
+    max-width: 100px;
+    border-radius: 50%;
+}

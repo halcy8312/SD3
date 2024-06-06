@@ -6,6 +6,30 @@ import time
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.getenv('SECRET_KEY', 'supersecretkey')
 
+def get_credits(api_key):
+    api_host = os.getenv('API_HOST', 'https://api.stability.ai')
+    url = f"{api_host}/v1/user/balance"
+    response = requests.get(url, headers={
+        "Authorization": f"Bearer {api_key}"
+    })
+
+    if response.status_code == 200:
+        return response.json().get('credits', None)
+    else:
+        return None
+
+def get_account_info(api_key):
+    api_host = os.getenv('API_HOST', 'https://api.stability.ai')
+    url = f"{api_host}/v1/user/account"
+    response = requests.get(url, headers={
+        "Authorization": f"Bearer {api_key}"
+    })
+
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None
+
 def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key, model, seed=None, output_format="png"):
     if model == "ultra":
         url = "https://api.stability.ai/v2beta/stable-image/generate/ultra"
@@ -136,10 +160,15 @@ def get_unique_filename(extension):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    credits = None
+    account_info = None
     if request.method == 'POST':
         session['api_key'] = request.form['api_key']
-        return redirect(url_for('generate'))
-    return render_template('index.html')
+        api_key = session['api_key']
+        credits = get_credits(api_key)
+        account_info = get_account_info(api_key)
+        return render_template('index.html', credits=credits, account_info=account_info)
+    return render_template('index.html', credits=credits, account_info=account_info)
 
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
