@@ -150,3 +150,10 @@ button.generate-button:hover {
     display: inline-block;
 }
 
+.char-count {
+    font-size: 0.9em;
+    color: #888;
+    margin-top: -10px;
+    display: block;
+    text-align: right;
+}
