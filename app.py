@@ -45,8 +45,6 @@ def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key,
         print(f"An error occurred: {err}")
         raise Exception(f"An unexpected error occurred: {err}")
 
-#以下変更なし（ultra追加時）
-
 def upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed=None, output_format="png", creativity=0.3):
     if upscale_type == "conservative":
         url = "https://api.stability.ai/v2beta/stable-image/upscale/conservative"
@@ -203,7 +201,7 @@ def upscaled():
 
 @app.route('/download_image/<filename>')
 def download_image(filename):
-    return send_file(f'static/{filename}", as_attachment=True)
+    return send_file(f'static/{filename}', as_attachment=True)
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
