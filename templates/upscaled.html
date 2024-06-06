@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}アップスケール結果{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>アップスケール結果</h1>
+    <img src="{{ url_for('static', filename=image_filename) }}" alt="アップスケールされた画像">
+    <br>
+    <a href="{{ url_for('download_image', filename=image_filename) }}" class="download-button">画像をダウンロード</a>
+    <br>
+    <a href="{{ url_for('upscale') }}" class="back-button">戻る</a>
+</div>
+{% endblock %}

@@ -91,3 +91,19 @@ button.generate-button:hover {
         width: 100%; /* 横幅いっぱいに広げる */
     }
 }
+
+.download-button, .back-button {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 8px;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.download-button:hover, .back-button:hover {
+    background: #0056b3;
+}

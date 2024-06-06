@@ -26,7 +26,7 @@ def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key,
         response = requests.post(url, headers=headers, files=files)
         response.raise_for_status()
         file_name = get_unique_filename(output_format)
-        file_path = f"{file_name}.{output_format}"
+        file_path = f"static/{file_name}.{output_format}"
         with open(file_path, 'wb') as file:
             file.write(response.content)
         return file_path
@@ -71,11 +71,11 @@ def upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed=No
     try:
         response = requests.post(url, headers=headers, files=files)
         response.raise_for_status()
+        file_name = get_unique_filename(output_format)
+        file_path = f"static/{file_name}.{output_format}"
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
         if upscale_type == "conservative":
-            file_name = get_unique_filename(output_format)
-            file_path = f"{file_name}.{output_format}"
-            with open(file_path, 'wb') as file:
-                file.write(response.content)
             return file_path
         else:
             upscale_id = response.json()["id"]
@@ -107,7 +107,7 @@ def fetch_creative_upscale_result(upscale_id, api_key, output_format="png"):
             else:
                 response.raise_for_status()
                 file_name = get_unique_filename(output_format)
-                file_path = f"{file_name}.{output_format}"
+                file_path = f"static/{file_name}.{output_format}"
                 with open(file_path, 'wb') as file:
                     file.write(response.content)
                 return file_path
@@ -126,7 +126,7 @@ def get_unique_filename(extension):
     i = 1
     while True:
         file_name = f"{i:03d}"
-        if not os.path.exists(f"{file_name}.{extension}"):
+        if not os.path.exists(f"static/{file_name}.{extension}"):
             return file_name
         i += 1
 
@@ -154,7 +154,8 @@ def generate():
 
         try:
             image_path = generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key, model, seed)
-            return send_file(image_path, mimetype='image/png')
+            image_filename = os.path.basename(image_path)
+            return redirect(url_for('generated', image_filename=image_filename))
         except Exception as e:
             return str(e)
     return render_template('generate.html')
@@ -178,10 +179,25 @@ def upscale():
 
         try:
             image_path = upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed, output_format, creativity)
-            return send_file(image_path, mimetype=f'image/{output_format}')
+            image_filename = os.path.basename(image_path)
+            return redirect(url_for('upscaled', image_filename=image_filename))
         except Exception as e:
             return str(e)
     return render_template('upscale.html')
+
+@app.route('/generated')
+def generated():
+    image_filename = request.args.get('image_filename')
+    return render_template('generated.html', image_filename=image_filename)
+
+@app.route('/upscaled')
+def upscaled():
+    image_filename = request.args.get('image_filename')
+    return render_template('upscaled.html', image_filename=image_filename)
+
+@app.route('/download_image/<filename>')
+def download_image(filename):
+    return send_file(f'static/{filename}', as_attachment=True)
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
