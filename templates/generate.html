@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container">
-    <h1>画像生成（sd3のみ動作します）</h1>
+    <h1>画像生成</h1>
     <form method="post">
         <div class="form-group">
             <label for="prompt">プロンプト:</label><br>
@@ -21,7 +21,7 @@
                 <option value="16:9">16:9</option>
                 <option value="4:3">4:3</option>
                 <option value="3:2">3:2</option>
-                <option value="9:16">9:16</option>
+                <option value="9:16">9:16（縦長）</option>
             </select><br>
         </div>
         <div class="form-group">
@@ -51,6 +51,7 @@
             <select id="model" name="model">
                 <option value="sd3">sd3</option>
                 <option value="sd3-turbo">sd3-turbo</option>
+                <option value="ultra">ultra</option>
             </select><br>
         </div>
         <div class="form-group">
