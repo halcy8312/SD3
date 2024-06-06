@@ -44,8 +44,12 @@ def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key,
 def upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed=None, output_format="png", creativity=0.3):
     if upscale_type == "conservative":
         url = "https://api.stability.ai/v2beta/stable-image/upscale/conservative"
+        if creativity < 0.2 or creativity > 0.5:
+            raise ValueError("Creativity for conservative upscale must be between 0.2 and 0.5")
     elif upscale_type == "creative":
         url = "https://api.stability.ai/v2beta/stable-image/upscale/creative"
+        if creativity < 0.2 or creativity > 0.35:
+            raise ValueError("Creativity for creative upscale must be between 0.2 and 0.35")
     else:
         raise ValueError("Invalid upscale type")
 
