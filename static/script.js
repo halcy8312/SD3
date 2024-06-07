@@ -55,7 +55,7 @@ document.getElementById('image').addEventListener('change', function(event) {
 
 // canvas.htmlで画像を読み込む（edit.htmlから送信された画像を表示）
 document.addEventListener('DOMContentLoaded', function() {
-    let imgSrc = document.getElementById('image-preview').src;
+    let imgSrc = document.getElementById('image-preview') ? document.getElementById('image-preview').src : null;
     if (imgSrc) {
         let img = new Image();
         img.onload = function() {
@@ -130,15 +130,19 @@ function draw(event) {
     maskCtx.lineCap = 'round';
     maskCtx.strokeStyle = tool === 'pen' ? 'white' : 'black';
     
-    ctx.lineTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+    let rect = canvas.getBoundingClientRect();
+    let x = event.clientX - rect.left;
+    let y = event.clientY - rect.top;
+
+    ctx.lineTo(x, y);
     ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+    ctx.moveTo(x, y);
 
-    maskCtx.lineTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+    maskCtx.lineTo(x, y);
     maskCtx.stroke();
     maskCtx.beginPath();
-    maskCtx.moveTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+    maskCtx.moveTo(x, y);
 }
 
 function updateCredits(apiKey) {
