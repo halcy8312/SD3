@@ -28,7 +28,7 @@ let maskCtx = maskCanvas.getContext('2d');
 maskCanvas.width = canvas.width;
 maskCanvas.height = canvas.height;
 
-// 画像プレビュー機能追加
+// 画像プレビュー機能追加（edit.html用）
 document.getElementById('image').addEventListener('change', function(event) {
     let reader = new FileReader();
     reader.onload = function() {
@@ -42,7 +42,6 @@ document.getElementById('image').addEventListener('change', function(event) {
             canvas.height = img.height;
             maskCanvas.width = img.width;
             maskCanvas.height = img.height;
-            
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             
             // プレビュー表示
@@ -52,6 +51,22 @@ document.getElementById('image').addEventListener('change', function(event) {
         img.src = reader.result;
     }
     reader.readAsDataURL(event.target.files[0]);
+});
+
+// canvas.htmlで画像を読み込む（edit.htmlから送信された画像を表示）
+document.addEventListener('DOMContentLoaded', function() {
+    let imgSrc = document.getElementById('image-preview').src;
+    if (imgSrc) {
+        let img = new Image();
+        img.onload = function() {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            maskCanvas.width = img.width;
+            maskCanvas.height = img.height;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
+        img.src = imgSrc;
+    }
 });
 
 canvas.addEventListener('mousedown', startPosition);
@@ -70,7 +85,7 @@ document.getElementById('reset-button').addEventListener('click', function() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
     let img = new Image();
-    img.src = document.getElementById('image').src;
+    img.src = document.getElementById('image-preview').src;
     img.onload = function() {
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     }
