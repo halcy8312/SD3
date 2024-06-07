@@ -271,19 +271,35 @@ def edit():
 
     if request.method == 'POST':
         image = request.files['image']
-        mask = request.form.get('mask')
         output_format = request.form.get('output_format', 'png')
         seed = request.form.get('seed')
         seed = int(seed) if seed else None
 
         try:
-            image_path = edit_image(image, mask, api_key, seed, output_format)
+            image_path = edit_image(image, None, api_key, seed, output_format)
             image_filename = os.path.basename(image_path)
             session['credits'] = get_credits(api_key)
-            return redirect(url_for('edited', image_filename=image_filename))
+            return redirect(url_for('canvas', image_filename=image_filename, output_format=output_format, seed=seed))
         except Exception as e:
             return str(e)
     return render_template('edit.html', credits=session.get('credits'))
+
+@app.route('/canvas', methods=['GET', 'POST'])
+def canvas():
+    if request.method == 'POST':
+        mask = request.form.get('mask')
+        output_format = request.form.get('output_format', 'png')
+        seed = request.form.get('seed', '')
+
+        # ここで画像編集処理を実行するか、canvas.htmlにデータを渡す
+        # 今回はそのままcanvas.htmlにデータを渡します
+        return render_template('canvas.html', output_format=output_format, seed=seed)
+    
+    image_filename = request.args.get('image_filename', '')
+    output_format = request.args.get('output_format', 'png')
+    seed = request.args.get('seed', '')
+    return render_template('canvas.html', image_filename=image_filename, output_format=output_format, seed=seed)
+
 
 @app.route('/edited')
 def edited():
@@ -312,10 +328,6 @@ def generated():
 def upscaled():
     image_filename = request.args.get('image_filename')
     return render_template('upscaled.html', image_filename=image_filename)
-
-@app.route('/canvas', methods=['GET'])
-def canvas():
-    return render_template('canvas.html')
 
 @app.route('/download_image/<filename>')
 def download_image(filename):

@@ -4,13 +4,13 @@
 
 {% block content %}
 <div class="container">
-    <h1>画像編集</h1>
+    <h1>画像編集（工事中）</h1>
     {% if credits is not none %}
     <div class="credit-info">
         <h2 id="credit-info">残りクレジット: {{ credits }}</h2>
     </div>
     {% endif %}
-    <form method="post" enctype="multipart/form-data" action="{{ url_for('canvas') }}">
+    <form method="post" enctype="multipart/form-data" action="{{ url_for('edit') }}">
         <div class="form-group">
             <label for="image">画像:</label><br>
             <input type="file" id="image" name="image" required><br>

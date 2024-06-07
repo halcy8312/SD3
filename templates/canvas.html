@@ -20,8 +20,8 @@
     </div>
     <form method="post" enctype="multipart/form-data" action="{{ url_for('edit') }}">
         <input type="hidden" id="mask" name="mask">
-        <input type="hidden" id="output_format" name="output_format" value="{{ request.form['output_format'] }}">
-        <input type="hidden" id="seed" name="seed" value="{{ request.form['seed'] }}">
+        <input type="hidden" id="output_format" name="output_format" value="{{ request.args.get('output_format', 'png') }}">
+        <input type="hidden" id="seed" name="seed" value="{{ request.args.get('seed', '') }}">
     </form>
 </div>
 <script src="{{ url_for('static', filename='script.js') }}"></script>
