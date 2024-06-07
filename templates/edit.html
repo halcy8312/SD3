@@ -4,26 +4,30 @@
 
 {% block content %}
 <div class="container">
-    <h1>画像編集(beta機能)</h1>
+    <h1>画像編集</h1>
     {% if credits is not none %}
     <div class="credit-info">
-        <h2>残りクレジット: {{ credits }}</h2>
+        <h2 id="credit-info">残りクレジット: {{ credits }}</h2>
     </div>
     {% endif %}
-    <form id="edit-form" method="post" action="{{ url_for('canvas') }}" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" action="{{ url_for('canvas') }}">
         <div class="form-group">
             <label for="image">画像:</label><br>
-            <input type="file" id="image" name="image" accept="image/*" required><br>
+            <input type="file" id="image" name="image" required><br>
         </div>
         <div class="form-group">
-            <label for="output_format">出力フォーマット:</label>
+            <label for="output_format">出力フォーマット:</label><br>
             <select id="output_format" name="output_format">
                 <option value="png">png</option>
                 <option value="jpeg">jpeg</option>
                 <option value="webp">webp</option>
-            </select>
+            </select><br>
         </div>
-        <button type="submit" class="generate-button">編集</button>
+        <div class="form-group">
+            <label for="seed">シード（任意）:</label><br>
+            <input type="text" id="seed" name="seed" placeholder="任意のシード値を入力してください"><br>
+        </div>
+        <button type="submit" class="edit-button">画像編集</button>
     </form>
 </div>
 {% endblock %}

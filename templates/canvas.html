@@ -1,39 +1,28 @@
 {% extends "base.html" %}
 
-{% block title %}画像編集{% endblock %}
+{% block title %}画像編集キャンバス{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h1>画像編集</h1>
-    {% if credits is not none %}
-    <div class="credit-info">
-        <h2>残りクレジット: {{ credits }}</h2>
+    <h1>画像編集キャンバス</h1>
+    <div class="canvas-container">
+        <canvas id="canvas"></canvas>
     </div>
-    {% endif %}
-    <form id="edit-form" method="post" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="image">画像:</label><br>
-            <input type="file" id="image" name="image" accept="image/*"><br>
-        </div>
-        <div class="form-group">
-            <label for="pen-size">ペンの太さ:</label>
-            <input type="range" id="pen-size" name="pen-size" min="1" max="50" value="10">
-        </div>
-        <div class="form-group">
-            <label for="eraser-size">消しゴムの太さ:</label>
-            <input type="range" id="eraser-size" name="eraser-size" min="1" max="50" value="10">
-        </div>
-        <div class="button-group">
-            <button type="button" id="pen-button">ペン</button>
-            <button type="button" id="eraser-button">消しゴム</button>
-            <button type="button" id="reset-button">リセット</button>
-            <button type="button" id="save-button">保存</button>
-        </div>
+    <div class="tools">
+        <label for="pen-size">ペンの太さ:</label>
+        <input type="range" id="pen-size" min="1" max="50" value="5">
+        <label for="eraser-size">消しゴムの太さ:</label>
+        <input type="range" id="eraser-size" min="1" max="50" value="5">
+        <button id="pen-button">ペン</button>
+        <button id="eraser-button">消しゴム</button>
+        <button id="reset-button">リセット</button>
+        <button id="save-button">保存</button>
+    </div>
+    <form method="post" enctype="multipart/form-data" action="{{ url_for('edit') }}">
         <input type="hidden" id="mask" name="mask">
-        <input type="hidden" id="uploaded_image" name="uploaded_image">
         <input type="hidden" id="output_format" name="output_format" value="{{ request.form['output_format'] }}">
+        <input type="hidden" id="seed" name="seed" value="{{ request.form['seed'] }}">
     </form>
-    <canvas id="canvas"></canvas>
 </div>
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 {% endblock %}

@@ -313,7 +313,7 @@ def upscaled():
     image_filename = request.args.get('image_filename')
     return render_template('upscaled.html', image_filename=image_filename)
 
-@app.route('/canvas')
+@app.route('/canvas', methods=['GET'])
 def canvas():
     return render_template('canvas.html')
 

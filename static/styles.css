@@ -60,7 +60,7 @@ input[type="file"] {
     border-radius: 4px;
 }
 
-button.generate-button {
+button.generate-button, button.edit-button {
     background: #007bff;
     color: #fff;
     border: none;
@@ -71,7 +71,7 @@ button.generate-button {
     margin-top: -20px;
 }
 
-button.generate-button:hover {
+button.generate-button:hover, button.edit-button:hover {
     background: #0056b3;
 }
 
@@ -108,7 +108,6 @@ button.generate-button:hover {
     background: #0056b3;
 }
 
-/* styles.css */
 .credit-info {
     padding: 10px;
     background-color: #e7f3fe;
@@ -156,6 +155,17 @@ button.generate-button:hover {
     margin-top: -10px;
     display: block;
     text-align: right;
+}
+
+.canvas-container {
+    margin-top: 20px;
+}
+
+canvas {
+    border: 1px solid #ccc;
+    width: 100%;
+    max-width: 800px;
+    height: auto;
 }
 
 .tools {
