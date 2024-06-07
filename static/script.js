@@ -28,6 +28,7 @@ let maskCtx = maskCanvas.getContext('2d');
 maskCanvas.width = canvas.width;
 maskCanvas.height = canvas.height;
 
+// 画像プレビュー機能追加
 document.getElementById('image').addEventListener('change', function(event) {
     let reader = new FileReader();
     reader.onload = function() {
@@ -43,6 +44,10 @@ document.getElementById('image').addEventListener('change', function(event) {
             maskCanvas.height = img.height;
             
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            // プレビュー表示
+            document.getElementById('image-preview').src = img.src;
+            document.getElementById('image-preview').style.display = 'block';
         }
         img.src = reader.result;
     }
