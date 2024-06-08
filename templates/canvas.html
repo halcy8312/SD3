@@ -18,7 +18,7 @@
         <button id="reset-button">リセット</button>
         <button id="save-button">保存</button>
     </div>
-    <form id="edit-form" method="post" enctype="multipart/form-data" action="{{ url_for('edit') }}">
+    <form id="edit-form" method="post" enctype="multipart/form-data" action="{{ url_for('canvas') }}">
         <input type="hidden" id="mask" name="mask">
         <input type="hidden" id="uploaded_image" name="uploaded_image">
         <input type="hidden" id="output_format" name="output_format" value="{{ request.args.get('output_format', 'png') }}">

@@ -295,15 +295,17 @@ def canvas():
         output_format = request.form.get('output_format', 'png')
         seed = request.form.get('seed', '')
 
-        # ここで画像編集処理を実行するか、canvas.htmlにデータを渡す
-        # 今回はそのままcanvas.htmlにデータを渡します
-        return render_template('canvas.html', mask=mask, uploaded_image=uploaded_image, output_format=output_format, seed=seed)
+        try:
+            edited_image_path = edit_image(uploaded_image, mask, session.get('api_key'), seed, output_format)
+            edited_image_filename = os.path.basename(edited_image_path)
+            return redirect(url_for('edited', image_filename=edited_image_filename))
+        except Exception as e:
+            return str(e)
     
     image_filename = request.args.get('image_filename', '')
     output_format = request.args.get('output_format', 'png')
     seed = request.args.get('seed', '')
     return render_template('canvas.html', image_filename=image_filename, output_format=output_format, seed=seed)
-
 
 @app.route('/edited')
 def edited():
