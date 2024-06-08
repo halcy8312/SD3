@@ -278,8 +278,10 @@ def edit():
         seed = int(seed) if seed else None
 
         try:
+            image_base64 = base64.b64encode(image.read()).decode('utf-8')
+            image_data = f"data:image/{output_format};base64,{image_base64}"
             # 画像編集処理を実行
-            image_path = edit_image(image, None, api_key, seed, output_format)
+            image_path = edit_image(image_data, None, api_key, seed, output_format)
             image_filename = os.path.basename(image_path)
             session['credits'] = get_credits(api_key)
             return redirect(url_for('canvas', image_filename=image_filename, output_format=output_format, seed=seed))

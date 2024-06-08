@@ -55,7 +55,7 @@ document.getElementById('image').addEventListener('change', function(event) {
 
 // canvas.htmlで画像を読み込む（edit.htmlから送信された画像を表示）
 document.addEventListener('DOMContentLoaded', function() {
-    let imgSrc = document.getElementById('image-preview') ? document.getElementById('image-preview').src : null;
+    let imgSrc = "{{ image_filename }}";
     if (imgSrc) {
         let img = new Image();
         img.onload = function() {
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
             maskCanvas.height = img.height;
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         };
-        img.src = imgSrc;
+        img.src = '/static/' + imgSrc;
     }
 });
 
