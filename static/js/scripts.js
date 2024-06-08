@@ -1,6 +1,6 @@
-　document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     // キャンバスの設定
-    let canvas = document.getElementById('canvas');
+    let canvas = document.getElementById('drawingCanvas');
     let ctx = canvas.getContext('2d');
     let painting = false;
     let tool = 'pen';
@@ -8,7 +8,7 @@
     let eraserSize = 10;
     let maskCanvas = document.createElement('canvas');
     let maskCtx = maskCanvas.getContext('2d');
-    
+
     maskCanvas.width = canvas.width;
     maskCanvas.height = canvas.height;
 
@@ -27,7 +27,7 @@
     }
 
     // 画像ファイル選択時のイベント
-    document.getElementById('image').addEventListener('change', function(event) {
+    document.getElementById('fileInput').addEventListener('change', function(event) {
         let reader = new FileReader();
         reader.onload = function() {
             let img = new Image();
@@ -126,13 +126,7 @@
         maskCtx.moveTo(x, y);
     }
 
-    // その他の設定やイベントリスナー（クレジット更新や画像保存機能など）
-    document.getElementById('generate-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        // 画像生成処理...
-        updateCredits(apiKey);
-    });
-
+    // クレジット更新機能
     function updateCredits(apiKey) {
         fetch('/get_credits', {
             method: 'POST',
@@ -147,6 +141,13 @@
         })
         .catch(error => console.error('Error:', error));
     }
+
+    // 画像生成後にクレジットを更新
+    document.getElementById('generate-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        // 画像生成処理...
+        updateCredits(apiKey);
+    });
 
     // ドラッグ＆ドロップ、ツールの選択、色の選択、サイズの選択
     const backgroundCanvas = document.getElementById('backgroundCanvas');
