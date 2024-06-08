@@ -1,11 +1,23 @@
-from flask import Flask, request, render_template, send_file, session, redirect, url_for, jsonify
 import os
+from flask import Flask, request, render_template, send_file, session, redirect, url_for, jsonify, flash
 import requests
 import time
 import base64
+from werkzeug.utils import secure_filename
+from PIL import Image
+import io
 
 app = Flask(__name__, static_url_path='/static')
+app.config['UPLOAD_FOLDER'] = 'static/images/'
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 app.secret_key = os.getenv('SECRET_KEY', 'supersecretkey')
+
+# Ensure the upload folder exists
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 def get_credits(api_key):
     api_host = os.getenv('API_HOST', 'https://api.stability.ai')
@@ -192,6 +204,47 @@ def edit_image(image, mask, api_key, seed=None, output_format="png"):
         print(f"An error occurred: {err}")
         raise Exception(f"An unexpected error occurred: {err}")
 
+def inpaint_image(image, mask, prompt, api_key, negative_prompt=None, seed=None, output_format="png"):
+    url = "https://api.stability.ai/v2beta/stable-image/edit/inpaint"
+    
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "accept": "image/*"
+    }
+    files = {
+        "image": ('image.png', base64.b64decode(image.split(',')[1])),
+        "prompt": (None, prompt)
+    }
+    if mask:
+        mask_data = base64.b64decode(mask.split(',')[1])
+        files["mask"] = ('mask.png', mask_data)
+    if negative_prompt:
+        files["negative_prompt"] = (None, negative_prompt)
+    data = {
+        "output_format": output_format
+    }
+    if seed is not None:
+        data["seed"] = str(seed)
+
+    try:
+        response = requests.post(url, headers=headers, files=files, data=data)
+        response.raise_for_status()
+        file_name = get_unique_filename(output_format)
+        file_path = f"static/{file_name}.{output_format}"
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
+        return file_path
+    except requests.exceptions.HTTPError as http_err:
+        try:
+            error_message = response.json()
+        except ValueError:
+            error_message = response.text
+        print(f"HTTP error occurred: {http_err}, Response: {error_message}")
+        raise Exception(f"Error: {response.status_code}, Response: {error_message}")
+    except Exception as err:
+        print(f"An error occurred: {err}")
+        raise Exception(f"An unexpected error occurred: {err}")
+
 def get_unique_filename(extension):
     i = 1
     while True:
@@ -309,6 +362,44 @@ def canvas():
     seed = request.args.get('seed', '')
     return render_template('canvas.html', image_filename=image_filename, output_format=output_format, seed=seed)
 
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        flash('No file part')
+        return redirect(request.url)
+    file = request.files['file']
+    if file.filename == '':
+        flash('No selected file')
+        return redirect(request.url)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        app.logger.info(f'File uploaded: {filename}')
+        return jsonify({'filename': filename})
+    flash('File not allowed')
+    return redirect(request.url)
+
+@app.route('/save', methods=['POST'])
+def save_image():
+    data = request.json
+    merged_image_data = data['merged_image']
+    drawing_image_data = data['drawing_image']
+
+    merged_image = Image.open(io.BytesIO(base64.b64decode(merged_image_data.split(',')[1])))
+    drawing_image = Image.open(io.BytesIO(base64.b64decode(drawing_image_data.split(',')[1])))
+
+    merged_image_path = os.path.join(app.config['UPLOAD_FOLDER'], 'merged_image.png')
+    drawing_image_path = os.path.join(app.config['UPLOAD_FOLDER'], 'drawing_image.png')
+
+    merged_image.save(merged_image_path, format='PNG', quality=100)  # Save with maximum quality
+    drawing_image.save(drawing_image_path, format='PNG', quality=100)
+
+    return jsonify(status='success')
+
+@app.route('/result')
+def result():
+    return render_template('drawing_result.html')
+
 @app.route('/edited')
 def edited():
     image_filename = request.args.get('image_filename')
@@ -356,5 +447,10 @@ def privacy_policy():
 def terms_of_service():
     return render_template('terms_of_service.html')
 
+@app.route('/drawing', methods=['GET', 'POST'])
+def drawing():
+    return render_template('drawing.html')
+
 if __name__ == '__main__':
-    app.run()
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)

@@ -197,3 +197,15 @@ canvas {
     margin: 20px 0;
     max-width: 100%;
 }
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+canvas {
+    border: 1px solid #000;
+}
+
+#toolbar {
+    margin-bottom: 10px;
+}
