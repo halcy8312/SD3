@@ -162,7 +162,7 @@ def edit_image(image, mask, api_key, seed=None, output_format="png"):
         "accept": "image/*"
     }
     files = {
-        "image": image,
+        "image": ('image.png', base64.b64decode(image.split(',')[1]))
     }
     if mask:
         mask_data = base64.b64decode(mask.split(',')[1])
@@ -271,12 +271,13 @@ def edit():
 
     if request.method == 'POST':
         image = request.files['image']
+        mask = request.form['mask']  # マスクを取得
         output_format = request.form.get('output_format', 'png')
         seed = request.form.get('seed')
         seed = int(seed) if seed else None
 
         try:
-            image_path = edit_image(image, None, api_key, seed, output_format)
+            image_path = edit_image(image, mask, api_key, seed, output_format)  # マスクを渡す
             image_filename = os.path.basename(image_path)
             session['credits'] = get_credits(api_key)
             return redirect(url_for('canvas', image_filename=image_filename, output_format=output_format, seed=seed))
@@ -288,18 +289,23 @@ def edit():
 def canvas():
     if request.method == 'POST':
         mask = request.form.get('mask')
+        uploaded_image = request.form.get('uploaded_image')
         output_format = request.form.get('output_format', 'png')
         seed = request.form.get('seed', '')
+        api_key = session.get('api_key')
 
-        # ここで画像編集処理を実行するか、canvas.htmlにデータを渡す
-        # 今回はそのままcanvas.htmlにデータを渡します
-        return render_template('canvas.html', output_format=output_format, seed=seed)
+        # 画像編集処理を実行
+        try:
+            image_path = edit_image(uploaded_image, mask, api_key, seed, output_format)
+            image_filename = os.path.basename(image_path)
+            return render_template('canvas.html', image_filename=image_filename, output_format=output_format, seed=seed)
+        except Exception as e:
+            return str(e)
     
     image_filename = request.args.get('image_filename', '')
     output_format = request.args.get('output_format', 'png')
     seed = request.args.get('seed', '')
     return render_template('canvas.html', image_filename=image_filename, output_format=output_format, seed=seed)
-
 
 @app.route('/edited')
 def edited():
