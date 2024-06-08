@@ -316,32 +316,6 @@ def upscale():
             return str(e)
     return render_template('upscale.html', credits=session.get('credits'))
 
-@app.route('/edit', methods=['GET', 'POST'])
-def edit():
-    api_key = session.get('api_key')
-    if not api_key:
-        return redirect(url_for('index'))
-
-    if request.method == 'POST':
-        image = request.files.get('image')
-        if not image:
-            return "No image file", 400
-        output_format = request.form.get('output_format', 'png')
-        seed = request.form.get('seed')
-        seed = int(seed) if seed else None
-
-        try:
-            image_base64 = base64.b64encode(image.read()).decode('utf-8')
-            image_data = f"data:image/{output_format};base64,{image_base64}"
-            # 画像編集処理を実行
-            image_path = edit_image(image_data, None, api_key, seed, output_format)
-            image_filename = os.path.basename(image_path)
-            session['credits'] = get_credits(api_key)
-            return redirect(url_for('canvas', image_filename=image_filename, output_format=output_format, seed=seed))
-        except Exception as e:
-            return str(e)
-    return render_template('edit.html', credits=session.get('credits'))
-
 @app.route('/canvas', methods=['GET', 'POST'])
 def canvas():
     if request.method == 'POST':
