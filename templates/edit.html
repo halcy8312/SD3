@@ -12,8 +12,6 @@
     <input type="file" id="erase-image" name="image" required>
     <label for="erase-mask">Mask:</label>
     <input type="file" id="erase-mask" name="mask">
-    <label for="erase-output_format">Output Format:</label>
-    <input type="text" id="erase-output_format" name="output_format" value="webp">
     <button type="submit">Erase</button>
 </form>
 
@@ -26,8 +24,6 @@
     <input type="file" id="inpaint-mask" name="mask">
     <label for="inpaint-prompt">Prompt:</label>
     <input type="text" id="inpaint-prompt" name="prompt" required>
-    <label for="inpaint-output_format">Output Format:</label>
-    <input type="text" id="inpaint-output_format" name="output_format" value="webp">
     <button type="submit">Inpaint</button>
 </form>
 
@@ -44,8 +40,6 @@
     <input type="number" id="outpaint-up" name="up">
     <label for="outpaint-down">Down:</label>
     <input type="number" id="outpaint-down" name="down">
-    <label for="outpaint-output_format">Output Format:</label>
-    <input type="text" id="outpaint-output_format" name="output_format" value="webp">
     <button type="submit">Outpaint</button>
 </form>
 {% endblock %}
