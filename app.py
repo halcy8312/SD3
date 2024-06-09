@@ -331,16 +331,64 @@ def erase():
     result = call_api('erase', files, data)
     return result
 
-@app.route('/inpaint', methods=['POST'])
+@app.route('/inpaint', methods=['GET', 'POST'])
 def inpaint():
-    image = request.files.get('image')
-    mask = request.files.get('mask')
-    prompt = request.form.get('prompt')
-    output_format = request.form.get('output_format', 'webp')
-    files = {'image': image, 'mask': mask}
-    data = {'prompt': prompt, 'output_format': output_format}
-    result = call_api('inpaint', files, data)
-    return result
+    api_key = session.get('api_key')
+    if not api_key:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        image = request.files['image']
+        prompt = request.form['prompt']
+        mask = request.files.get('mask')
+        negative_prompt = request.form.get('negative_prompt')
+        output_format = "png"  # 出力形式をPNGに設定
+        seed = request.form.get('seed')
+        seed = int(seed) if seed else None
+
+        try:
+            # API呼び出しを直接行う
+            url = "https://api.stability.ai/v2beta/stable-image/edit/inpaint"
+            headers = {
+                "Authorization": f"Bearer {api_key}",
+                "accept": "image/*"
+            }
+            files = {
+                "image": image,
+                "prompt": (None, prompt)
+            }
+            if mask:
+                files["mask"] = mask
+            if negative_prompt:
+                files["negative_prompt"] = (None, negative_prompt)
+            data = {
+                "output_format": output_format
+            }
+            if seed is not None:
+                data["seed"] = str(seed)
+
+            response = requests.post(url, headers=headers, files=files, data=data)
+            response.raise_for_status()
+            
+            file_name = get_unique_filename(output_format)
+            file_path = f"static/{file_name}.{output_format}"
+            with open(file_path, 'wb') as file:
+                file.write(response.content)
+            
+            image_filename = os.path.basename(file_path)
+            session['credits'] = get_credits(api_key)
+            return redirect(url_for('inpainted', image_filename=image_filename))
+        except requests.exceptions.HTTPError as http_err:
+            try:
+                error_message = response.json()
+            except ValueError:
+                error_message = response.text
+            print(f"HTTP error occurred: {http_err}, Response: {error_message}")
+            return f"Error: {response.status_code}, Response: {error_message}"
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return str(e)
+    return render_template('inpaint.html', credits=session.get('credits'))
 
 @app.route('/outpaint', methods=['POST'])
 def outpaint():
