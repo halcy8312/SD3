@@ -1,24 +1,29 @@
-{% extends "base.html" %}
-
-{% block title %}画像の不要なオブジェクトを消去{% endblock %}
-
-{% block content %}
-<h1>画像の不要なオブジェクトを消去</h1>
-<form action="{{ url_for('erase') }}" method="post" enctype="multipart/form-data">
-    <label for="image">画像を選択：</label>
-    <input type="file" name="image" id="image" required><br>
-    <label for="mask">マスクを選択（オプション）：</label>
-    <input type="file" name="mask" id="mask"><br>
-    <label for="output_format">出力形式：</label>
-    <select name="output_format" id="output_format">
-        <option value="png">PNG</option>
-        <option value="jpg">JPG</option>
-        <option value="jpeg">JPEG</option>
-        <option value="gif">GIF</option>
-    </select><br>
-    <label for="seed">シード（オプション）：</label>
-    <input type="number" name="seed" id="seed"><br>
-    <input type="submit" value="消去">
-</form>
-<p>クレジット: {{ credits }}</p>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/oekaki_styles.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <a href="{{ url_for('generate') }}" class="nav-button">画像生成</a>
+        <a href="{{ url_for('upscale') }}" class="nav-button">アップスケール</a>
+        <a href="{{ url_for('oekaki_index') }}" class="nav-button">Oekaki</a>
+        <a href="{{ url_for('index') }}" class="nav-button">API</a>
+        <a href="{{ url_for('contact') }}" class="nav-button">お問い合わせ</a>
+        <a href="{{ url_for('privacy_policy') }}" class="nav-button">プライバシーポリシー</a>
+        <a href="{{ url_for('terms_of_service') }}" class="nav-button">利用規約</a>
+        {% if session.get('credits') is not none %}
+        <div class="credits">
+            <p>残りクレジット: {{ session.get('credits') }}</p>
+        </div>
+        {% endif %}
+    </div>
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
