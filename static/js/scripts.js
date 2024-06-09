@@ -1,7 +1,15 @@
 document.addEventListener('DOMContentLoaded', function() {
     // キャンバスの設定
     let canvas = document.getElementById('drawingCanvas');
+    if (!canvas) {
+        console.error('Canvas element not found');
+        return;
+    }
     let ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('Canvas context not found');
+        return;
+    }
     let painting = false;
     let tool = 'pen';
     let penSize = 10;
@@ -34,13 +42,13 @@ document.addEventListener('DOMContentLoaded', function() {
             img.onload = function() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-                
+
                 canvas.width = img.width;
                 canvas.height = img.height;
                 maskCanvas.width = img.width;
                 maskCanvas.height = img.height;
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                
+
                 document.getElementById('image-preview').src = img.src;
                 document.getElementById('image-preview').style.display = 'block';
             }
@@ -106,11 +114,11 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.lineWidth = tool === 'pen' ? penSize : eraserSize;
         ctx.lineCap = 'round';
         ctx.strokeStyle = tool === 'pen' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 1)';
-        
+
         maskCtx.lineWidth = tool === 'pen' ? penSize : eraserSize;
         maskCtx.lineCap = 'round';
         maskCtx.strokeStyle = tool === 'pen' ? 'white' : 'black';
-        
+
         let rect = canvas.getBoundingClientRect();
         let x = event.clientX - rect.left;
         let y = event.clientY - rect.top;
@@ -162,7 +170,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const sizePicker = document.getElementById('sizePicker');
 
     let drawing = false;
-    let tool = 'pen';
     let color = '#000000';
     let size = 5;
     let image = null;
