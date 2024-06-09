@@ -186,9 +186,10 @@ def call_api(endpoint, files, data, api_key):
         data=data
     )
     if response.status_code == 200:
-        return response.content
+        return response.content, response.headers['Content-Type']
     else:
         raise Exception(response.json())
+
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -348,8 +349,10 @@ def erase():
     output_format = 'png'
     files = {'image': image, 'mask': mask}
     data = {'output_format': output_format}
-    result = call_api('erase', files, data, api_key)
-    return result
+    result, content_type = call_api('erase', files, data, api_key)
+    response = make_response(result)
+    response.headers.set('Content-Type', content_type)
+    return response
 
 @app.route('/inpaint', methods=['POST'])
 def inpaint():
@@ -362,8 +365,10 @@ def inpaint():
     output_format = 'png'
     files = {'image': image, 'mask': mask}
     data = {'prompt': prompt, 'output_format': output_format}
-    result = call_api('inpaint', files, data, api_key)
-    return result
+    result, content_type = call_api('inpaint', files, data, api_key)
+    response = make_response(result)
+    response.headers.set('Content-Type', content_type)
+    return response
 
 @app.route('/outpaint', methods=['POST'])
 def outpaint():
@@ -378,8 +383,10 @@ def outpaint():
     output_format = 'png'
     files = {'image': image}
     data = {'left': left, 'right': right, 'up': up, 'down': down, 'output_format': output_format}
-    result = call_api('outpaint', files, data, api_key)
-    return result
+    result, content_type = call_api('outpaint', files, data, api_key)
+    response = make_response(result)
+    response.headers.set('Content-Type', content_type)
+    return response
 
     
 @app.route('/edit', methods=['GET', 'POST'])
