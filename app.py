@@ -321,6 +321,40 @@ def privacy_policy():
 def terms_of_service():
     return render_template('terms_of_service.html')
 
+@app.route('/erase', methods=['POST'])
+def erase():
+    image = request.files.get('image')
+    mask = request.files.get('mask')
+    output_format = request.form.get('output_format', 'webp')
+    files = {'image': image, 'mask': mask}
+    data = {'output_format': output_format}
+    result = call_api('erase', files, data)
+    return result
+
+@app.route('/inpaint', methods=['POST'])
+def inpaint():
+    image = request.files.get('image')
+    mask = request.files.get('mask')
+    prompt = request.form.get('prompt')
+    output_format = request.form.get('output_format', 'webp')
+    files = {'image': image, 'mask': mask}
+    data = {'prompt': prompt, 'output_format': output_format}
+    result = call_api('inpaint', files, data)
+    return result
+
+@app.route('/outpaint', methods=['POST'])
+def outpaint():
+    image = request.files.get('image')
+    left = request.form.get('left')
+    right = request.form.get('right')
+    up = request.form.get('up')
+    down = request.form.get('down')
+    output_format = request.form.get('output_format', 'webp')
+    files = {'image': image}
+    data = {'left': left, 'right': right, 'up': up, 'down': down, 'output_format': output_format}
+    result = call_api('outpaint', files, data)
+    return result
+    
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)

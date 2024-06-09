@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Image Editing{% endblock %}
+
+{% block content %}
+<h1>SD3 Image Editing</h1>
+
+<!-- Erase Form -->
+<h2>Erase</h2>
+<form action="/erase" method="post" enctype="multipart/form-data">
+    <label for="erase-image">Image:</label>
+    <input type="file" id="erase-image" name="image" required>
+    <label for="erase-mask">Mask:</label>
+    <input type="file" id="erase-mask" name="mask">
+    <label for="erase-output_format">Output Format:</label>
+    <input type="text" id="erase-output_format" name="output_format" value="webp">
+    <button type="submit">Erase</button>
+</form>
+
+<!-- Inpaint Form -->
+<h2>Inpaint</h2>
+<form action="/inpaint" method="post" enctype="multipart/form-data">
+    <label for="inpaint-image">Image:</label>
+    <input type="file" id="inpaint-image" name="image" required>
+    <label for="inpaint-mask">Mask:</label>
+    <input type="file" id="inpaint-mask" name="mask">
+    <label for="inpaint-prompt">Prompt:</label>
+    <input type="text" id="inpaint-prompt" name="prompt" required>
+    <label for="inpaint-output_format">Output Format:</label>
+    <input type="text" id="inpaint-output_format" name="output_format" value="webp">
+    <button type="submit">Inpaint</button>
+</form>
+
+<!-- Outpaint Form -->
+<h2>Outpaint</h2>
+<form action="/outpaint" method="post" enctype="multipart/form-data">
+    <label for="outpaint-image">Image:</label>
+    <input type="file" id="outpaint-image" name="image" required>
+    <label for="outpaint-left">Left:</label>
+    <input type="number" id="outpaint-left" name="left">
+    <label for="outpaint-right">Right:</label>
+    <input type="number" id="outpaint-right" name="right">
+    <label for="outpaint-up">Up:</label>
+    <input type="number" id="outpaint-up" name="up">
+    <label for="outpaint-down">Down:</label>
+    <input type="number" id="outpaint-down" name="down">
+    <label for="outpaint-output_format">Output Format:</label>
+    <input type="text" id="outpaint-output_format" name="output_format" value="webp">
+    <button type="submit">Outpaint</button>
+</form>
+{% endblock %}
