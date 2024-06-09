@@ -59,7 +59,7 @@ def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key,
         "prompt": (None, prompt),
         "negative_prompt": (None, negative_prompt),
         "aspect_ratio": (None, aspect_ratio),
-        "style_preset": (None, style_ppreset),
+        "style_preset": (None, style_preset),
         "output_format": (None, output_format),
         "model": (None, model)
     }
@@ -295,6 +295,56 @@ def outpaint_image(image, directions, api_key, prompt=None, seed=None, output_fo
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/generate', methods=['GET', 'POST'])
+def generate():
+    api_key = session.get('api_key')
+    if not api_key:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        prompt = request.form['prompt']
+        negative_prompt = request.form['negative_prompt']
+        aspect_ratio = request.form['aspect_ratio']
+        style_preset = request.form['style_preset']
+        model = request.form['model']
+        seed = request.form.get('seed')
+        seed = int(seed) if seed else None
+
+        try:
+            image_path = generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key, model, seed)
+            image_filename = os.path.basename(image_path)
+            session['credits'] = get_credits(api_key)
+            return redirect(url_for('generated', image_filename=image_filename))
+        except Exception as e:
+            return str(e)
+    return render_template('generate.html', credits=session.get('credits'))
+
+@app.route('/upscale', methods=['GET', 'POST'])
+def upscale():
+    api_key = session.get('api_key')
+    if not api_key:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        image = request.files['image']
+        prompt = request.form['prompt']
+        negative_prompt = request.form['negative_prompt']
+        upscale_type = request.form['upscale_type']
+        output_format = request.form['output_format']
+        seed = request.form.get('seed')
+        seed = int(seed) if seed else None
+        creativity = request.form.get('creativity')
+        creativity = float(creativity) if creativity else 0.3
+
+        try:
+            image_path = upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed, output_format, creativity)
+            image_filename = os.path.basename(image_path)
+            session['credits'] = get_credits(api_key)
+            return redirect(url_for('upscaled', image_filename=image_filename))
+        except Exception as e:
+            return str(e)
+    return render_template('upscale.html', credits=session.get('credits'))
 
 @app.route('/erase', methods=['GET', 'POST'])
 def erase():
