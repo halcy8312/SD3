@@ -68,6 +68,44 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Uploadボタンがファイル入力要素をクリックするように設定
+    let uploadButton = document.getElementById('upload');
+    let fileInput = document.getElementById('fileInput');
+    if (uploadButton && fileInput) {
+        uploadButton.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', function(event) {
+            let reader = new FileReader();
+            reader.onload = function() {
+                let img = new Image();
+                img.onload = function() {
+                    if (ctx) {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+
+                        // 画像のサイズに合わせてキャンバスのサイズを調整
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        maskCanvas.width = img.width;
+                        maskCanvas.height = img.height;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                        // プレビュー表示
+                        let imagePreview = document.getElementById('image-preview');
+                        if (imagePreview) {
+                            imagePreview.src = img.src;
+                            imagePreview.style.display = 'block';
+                        }
+                    }
+                }
+                img.src = reader.result;
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        });
+    }
+
     // canvas.htmlで画像を読み込む（edit.htmlから送信された画像を表示）
     let imgSrc = "{{ image_filename }}";
     if (imgSrc && ctx) {
