@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div id="result-container">
+        <div>
+            <h2>Merged Image</h2>
+            <img id="mergedImage" src="{{ url_for('static', filename='images/merged_image.png') }}" alt="Merged Image">
+            <button id="downloadMerged">DL!</button>
+        </div>
+        <div>
+            <h2>Drawing Layer</h2>
+            <img id="drawingImage" src="{{ url_for('static', filename='images/drawing_image.png') }}" alt="Drawing Layer">
+            <button id="downloadDrawing">DL!</button>
+        </div>
+    </div>
+    <button id="back">Back</button>
+    <script src="{{ url_for('static', filename='js/result.js') }}"></script>
+</body>
+</html>
