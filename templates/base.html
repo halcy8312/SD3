@@ -12,7 +12,7 @@
         <a href="{{ url_for('generate') }}" class="nav-button">画像生成</a>
         <a href="{{ url_for('upscale') }}" class="nav-button">アップスケール</a>
         <a href="{{ url_for('oekaki_index') }}" class="nav-button">Oekaki</a>
-        <a href="{{ url_for('home') }}" class="nav-button">API</a> <!-- 修正箇所 -->
+        <a href="{{ url_for('index') }}" class="nav-button">API</a>
         <a href="{{ url_for('contact') }}" class="nav-button">お問い合わせ</a>
         <a href="{{ url_for('privacy_policy') }}" class="nav-button">プライバシーポリシー</a>
         <a href="{{ url_for('terms_of_service') }}" class="nav-button">利用規約</a>
@@ -25,6 +25,5 @@
     <div class="content">
         {% block content %}{% endblock %}
     </div>
-    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 </body>
 </html>
