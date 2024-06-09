@@ -185,7 +185,7 @@ def call_api(endpoint, files, data, api_key):
         files=files,
         data=data,
         stream=True,  # ストリーミングを有効にする
-        timeout=300  # タイムアウトを設定する
+        timeout=600  # タイムアウトを設定する
     )
     if response.status_code == 200:
         response.raw.decode_content = True
