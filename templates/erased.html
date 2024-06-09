@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}消去された画像{% endblock %}
+
+{% block content %}
+<h1>消去された画像</h1>
+<img src="{{ url_for('static', filename='images/' + image_filename) }}" alt="消去された画像">
+<p>クレジット: {{ credits }}</p>
+<a href="{{ url_for('download_image', filename=image_filename) }}">画像をダウンロード</a>
+{% endblock %}

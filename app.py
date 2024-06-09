@@ -174,45 +174,148 @@ def get_unique_filename(extension):
             return file_name
         i += 1
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    credits = None
-    account_info = None
-    if request.method == 'POST':
-        session['api_key'] = request.form['api_key']
-        api_key = session['api_key']
-        credits = get_credits(api_key)
-        account_info = get_account_info(api_key)
-        session['credits'] = credits
-        return render_template('index.html', credits=credits, account_info=account_info)
-    return render_template('index.html', credits=session.get('credits'), account_info=account_info)
+# New functions for Erase, Inpaint, and Outpaint
 
-@app.route('/generate', methods=['GET', 'POST'])
-def generate():
+def erase_image(image, mask, api_key, seed=None, output_format="png"):
+    url = "https://api.stability.ai/v2beta/stable-image/edit/erase"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "accept": "image/*"
+    }
+    files = {
+        "image": image,
+    }
+    if mask:
+        files["mask"] = mask
+    data = {
+        "output_format": output_format
+    }
+    if seed is not None:
+        data["seed"] = str(seed)
+
+    try:
+        response = requests.post(url, headers=headers, files=files, data=data)
+        response.raise_for_status()
+        file_name = get_unique_filename(output_format)
+        file_path = f"static/{file_name}.{output_format}"
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
+        return file_path
+    except requests.exceptions.HTTPError as http_err:
+        try:
+            error_message = response.json()
+        except ValueError:
+            error_message = response.text
+        print(f"HTTP error occurred: {http_err}, Response: {error_message}")
+        raise Exception(f"Error: {response.status_code}, Response: {error_message}")
+    except Exception as err:
+        print(f"An error occurred: {err}")
+        raise Exception(f"An unexpected error occurred: {err}")
+
+def inpaint_image(image, prompt, mask, api_key, negative_prompt=None, seed=None, output_format="png"):
+    url = "https://api.stability.ai/v2beta/stable-image/edit/inpaint"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "accept": "image/*"
+    }
+    files = {
+        "image": image,
+        "prompt": (None, prompt)
+    }
+    if mask:
+        files["mask"] = mask
+    if negative_prompt:
+        files["negative_prompt"] = (None, negative_prompt)
+    data = {
+        "output_format": output_format
+    }
+    if seed is not None:
+        data["seed"] = str(seed)
+
+    try:
+        response = requests.post(url, headers=headers, files=files, data=data)
+        response.raise_for_status()
+        file_name = get_unique_filename(output_format)
+        file_path = f"static/{file_name}.{output_format}"
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
+        return file_path
+    except requests.exceptions.HTTPError as http_err:
+        try:
+            error_message = response.json()
+        except ValueError:
+            error_message = response.text
+        print(f"HTTP error occurred: {http_err}, Response: {error_message}")
+        raise Exception(f"Error: {response.status_code}, Response: {error_message}")
+    except Exception as err:
+        print(f"An error occurred: {err}")
+        raise Exception(f"An unexpected error occurred: {err}")
+
+def outpaint_image(image, directions, api_key, prompt=None, seed=None, output_format="png", creativity=None):
+    url = "https://api.stability.ai/v2beta/stable-image/edit/outpaint"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "accept": "image/*"
+    }
+    files = {
+        "image": image,
+    }
+    data = {
+        "output_format": output_format,
+        **directions
+    }
+    if prompt:
+        data["prompt"] = prompt
+    if seed is not None:
+        data["seed"] = str(seed)
+    if creativity is not None:
+        data["creativity"] = str(creativity)
+
+    try:
+        response = requests.post(url, headers=headers, files=files, data=data)
+        response.raise_for_status()
+        file_name = get_unique_filename(output_format)
+        file_path = f"static/{file_name}.{output_format}"
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
+        return file_path
+    except requests.exceptions.HTTPError as http_err:
+        try:
+            error_message = response.json()
+        except ValueError:
+            error_message = response.text
+        print(f"HTTP error occurred: {http_err}, Response: {error_message}")
+        raise Exception(f"Error: {response.status_code}, Response: {error_message}")
+    except Exception as err:
+        print(f"An error occurred: {err}")
+        raise Exception(f"An unexpected error occurred: {err}")
+
+# Routes for Erase, Inpaint, and Outpaint
+
+@app.route('/erase', methods=['GET', 'POST'])
+def erase():
     api_key = session.get('api_key')
     if not api_key:
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        prompt = request.form['prompt']
-        negative_prompt = request.form['negative_prompt']
-        aspect_ratio = request.form['aspect_ratio']
-        style_preset = request.form['style_preset']
-        model = request.form['model']
+        image = request.files['image']
+        mask = request.files.get('mask')
+        output_format = request.form['output_format']
         seed = request.form.get('seed')
         seed = int(seed) if seed else None
 
         try:
-            image_path = generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key, model, seed)
+            image_path = erase_image(image, mask, api_key, seed, output_format)
             image_filename = os.path.basename(image_path)
             session['credits'] = get_credits(api_key)
-            return redirect(url_for('generated', image_filename=image_filename))
+            return redirect(url_for('erased', image_filename=image_filename))
         except Exception as e:
             return str(e)
-    return render_template('generate.html', credits=session.get('credits'))
+    return render_template('erase.html', credits=session.get('credits'))
 
-@app.route('/upscale', methods=['GET', 'POST'])
-def upscale():
+@app.route('/inpaint', methods=['GET', 'POST'])
+def inpaint():
     api_key = session.get('api_key')
     if not api_key:
         return redirect(url_for('index'))
@@ -220,22 +323,66 @@ def upscale():
     if request.method == 'POST':
         image = request.files['image']
         prompt = request.form['prompt']
-        negative_prompt = request.form['negative_prompt']
-        upscale_type = request.form['upscale_type']
+        mask = request.files.get('mask')
+        negative_prompt = request.form.get('negative_prompt')
+        output_format = request.form['output_format']
+        seed = request.form.get('seed')
+        seed = int(seed) if seed else None
+
+        try:
+            image_path = inpaint_image(image, prompt, mask, api_key, negative_prompt, seed, output_format)
+            image_filename = os.path.basename(image_path)
+            session['credits'] = get_credits(api_key)
+            return redirect(url_for('inpainted', image_filename=image_filename))
+        except Exception as e:
+            return str(e)
+    return render_template('inpaint.html', credits=session.get('credits'))
+
+@app.route('/outpaint', methods=['GET', 'POST'])
+def outpaint():
+    api_key = session.get('api_key')
+    if not api_key:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        image = request.files['image']
+        directions = {
+            "left": request.form.get('left'),
+            "right": request.form.get('right'),
+            "up": request.form.get('up'),
+            "down": request.form.get('down')
+        }
+        directions = {k: int(v) for k, v in directions.items() if v}
+        prompt = request.form.get('prompt')
         output_format = request.form['output_format']
         seed = request.form.get('seed')
         seed = int(seed) if seed else None
         creativity = request.form.get('creativity')
-        creativity = float(creativity) if creativity else 0.3
+        creativity = float(creativity) if creativity else None
 
         try:
-            image_path = upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed, output_format, creativity)
+            image_path = outpaint_image(image, directions, api_key, prompt, seed, output_format, creativity)
             image_filename = os.path.basename(image_path)
             session['credits'] = get_credits(api_key)
-            return redirect(url_for('upscaled', image_filename=image_filename))
+            return redirect(url_for('outpainted', image_filename=image_filename))
         except Exception as e:
             return str(e)
-    return render_template('upscale.html', credits=session.get('credits'))
+    return render_template('outpaint.html', credits=session.get('credits'))
+
+@app.route('/erased')
+def erased():
+    image_filename = request.args.get('image_filename')
+    return render_template('erased.html', image_filename=image_filename)
+
+@app.route('/inpainted')
+def inpainted():
+    image_filename = request.args.get('image_filename')
+    return render_template('inpainted.html', image_filename=image_filename)
+
+@app.route('/outpainted')
+def outpainted():
+    image_filename = request.args.get('image_filename')
+    return render_template('outpainted.html', image_filename=image_filename)
 
 @app.route('/oekaki')
 def oekaki_index():

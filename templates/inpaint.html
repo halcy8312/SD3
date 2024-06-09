@@ -1,14 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}画像の不要なオブジェクトを消去{% endblock %}
+{% block title %}画像のインペイント{% endblock %}
 
 {% block content %}
-<h1>画像の不要なオブジェクトを消去</h1>
-<form action="{{ url_for('erase') }}" method="post" enctype="multipart/form-data">
+<h1>画像のインペイント</h1>
+<form action="{{ url_for('inpaint') }}" method="post" enctype="multipart/form-data">
     <label for="image">画像を選択：</label>
     <input type="file" name="image" id="image" required><br>
+    <label for="prompt">プロンプト：</label>
+    <input type="text" name="prompt" id="prompt" required><br>
     <label for="mask">マスクを選択（オプション）：</label>
     <input type="file" name="mask" id="mask"><br>
+    <label for="negative_prompt">ネガティブプロンプト（オプション）：</label>
+    <input type="text" name="negative_prompt" id="negative_prompt"><br>
     <label for="output_format">出力形式：</label>
     <select name="output_format" id="output_format">
         <option value="png">PNG</option>
@@ -18,7 +22,7 @@
     </select><br>
     <label for="seed">シード（オプション）：</label>
     <input type="number" name="seed" id="seed"><br>
-    <input type="submit" value="消去">
+    <input type="submit" value="インペイント">
 </form>
 <p>クレジット: {{ credits }}</p>
 {% endblock %}

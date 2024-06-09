@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}画像のアウトペイント{% endblock %}
+
+{% block content %}
+<h1>画像のアウトペイント</h1>
+<form action="{{ url_for('outpaint') }}" method="post" enctype="multipart/form-data">
+    <label for="image">画像を選択：</label>
+    <input type="file" name="image" id="image" required><br>
+    <label for="left">左に追加するピクセル数（オプション）：</label>
+    <input type="number" name="left" id="left"><br>
+    <label for="right">右に追加するピクセル数（オプション）：</label>
+    <input type="number" name="right" id="right"><br>
+    <label for="up">上に追加するピクセル数（オプション）：</label>
+    <input type="number" name="up" id="up"><br>
+    <label for="down">下に追加するピクセル数（オプション）：</label>
+    <input type="number" name="down" id="down"><br>
+    <label for="prompt">プロンプト（オプション）：</label>
+    <input type="text" name="prompt" id="prompt"><br>
+    <label for="output_format">出力形式：</label>
+    <select name="output_format" id="output_format">
+        <option value="png">PNG</option>
+        <option value="jpg">JPG</option>
+        <option value="jpeg">JPEG</option>
+        <option value="gif">GIF</option>
+    </select><br>
+    <label for="seed">シード（オプション）：</label>
+    <input type="number" name="seed" id="seed"><br>
+    <label for="creativity">クリエイティビティ（オプション）：</label>
+    <input type="number" step="0.1" name="creativity" id="creativity"><br>
+    <input type="submit" value="アウトペイント">
+</form>
+<p>クレジット: {{ credits }}</p>
+{% endblock %}
