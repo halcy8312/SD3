@@ -363,13 +363,21 @@ def inpaint():
     image = request.files.get('image')
     mask = request.files.get('mask')
     prompt = request.form.get('prompt')
-    output_format = 'png'
+    negative_prompt = request.form.get('negative_prompt')
+    seed = request.form.get('seed')
+    output_format = request.form.get('output_format', 'png')
     files = {'image': image, 'mask': mask}
-    data = {'prompt': prompt, 'output_format': output_format}
+    data = {
+        'prompt': prompt,
+        'negative_prompt': negative_prompt,
+        'seed': seed,
+        'output_format': output_format
+    }
     result, content_type = call_api('inpaint', files, data, api_key)
     response = make_response(result)
     response.headers.set('Content-Type', content_type)
     return response
+
 
 @app.route('/outpaint', methods=['POST'])
 def outpaint():

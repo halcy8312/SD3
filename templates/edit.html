@@ -24,6 +24,16 @@
     <input type="file" id="inpaint-mask" name="mask">
     <label for="inpaint-prompt">Prompt:</label>
     <input type="text" id="inpaint-prompt" name="prompt" required>
+    <label for="inpaint-negative-prompt">Negative Prompt:</label>
+    <input type="text" id="inpaint-negative-prompt" name="negative_prompt">
+    <label for="inpaint-seed">Seed:</label>
+    <input type="number" id="inpaint-seed" name="seed">
+    <label for="inpaint-output-format">Output Format:</label>
+    <select id="inpaint-output-format" name="output_format">
+        <option value="png">PNG</option>
+        <option value="jpeg">JPEG</option>
+        <option value="webp">WEBP</option>
+    </select>
     <button type="submit">Inpaint</button>
 </form>
 
@@ -32,14 +42,20 @@
 <form action="/outpaint" method="post" enctype="multipart/form-data">
     <label for="outpaint-image">Image:</label>
     <input type="file" id="outpaint-image" name="image" required>
-    <label for="outpaint-left">Left:</label>
-    <input type="number" id="outpaint-left" name="left">
-    <label for="outpaint-right">Right:</label>
-    <input type="number" id="outpaint-right" name="right">
-    <label for="outpaint-up">Up:</label>
-    <input type="number" id="outpaint-up" name="up">
-    <label for="outpaint-down">Down:</label>
-    <input type="number" id="outpaint-down" name="down">
+    <label for="outpaint-left">Left (0-2000):</label>
+    <input type="number" id="outpaint-left" name="left" min="0" max="2000">
+    <label for="outpaint-right">Right (0-2000):</label>
+    <input type="number" id="outpaint-right" name="right" min="0" max="2000">
+    <label for="outpaint-up">Up (0-2000):</label>
+    <input type="number" id="outpaint-up" name="up" min="0" max="2000">
+    <label for="outpaint-down">Down (0-2000):</label>
+    <input type="number" id="outpaint-down" name="down" min="0" max="2000">
+    <label for="outpaint-prompt">Prompt:</label>
+    <input type="text" id="outpaint-prompt" name="prompt">
+    <label for="outpaint-seed">Seed:</label>
+    <input type="number" id="outpaint-seed" name="seed">
+    <label for="outpaint-creativity">Creativity (0.0-1.0):</label>
+    <input type="number" step="0.1" min="0" max="1" id="outpaint-creativity" name="creativity">
     <button type="submit">Outpaint</button>
 </form>
 {% endblock %}
