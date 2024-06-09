@@ -5,28 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Drawing Tool</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/oekaki_styles.css') }}">
 </head>
 <body>
     <div id="toolbar">
-        <button id="upload" type="button">Upload Image</button>
+        <button id="upload">Upload Image</button>
         <input type="file" id="fileInput" style="display: none;">
-        <button id="save" type="button">Save Image</button>
-        <label for="tool">Select Tool:</label>
-        <select id="tool" title="Select a tool">
+        <button id="save">Save Image</button>
+        <select id="tool">
             <option value="pen">Pen</option>
             <option value="eraser">Eraser</option>
         </select>
-        <label for="colorPicker">Select Color:</label>
-        <input type="color" id="colorPicker" value="#000000" title="Select color">
-        <label for="sizePicker">Select Size:</label>
-        <input type="range" id="sizePicker" min="1" max="30" value="5" title="Select size">
+        <input type="color" id="colorPicker" value="#000000">
+        <input type="range" id="sizePicker" min="1" max="30" value="5">
     </div>
-    <div class="canvas-container">
-        <canvas id="backgroundCanvas" class="canvas"></canvas>
-        <canvas id="drawingCanvas" class="canvas"></canvas>
+    <div style="position: relative; width: 100%; height: 100vh;">
+        <canvas id="backgroundCanvas" style="position: absolute; left: 0; top: 0;"></canvas>
+        <canvas id="drawingCanvas" style="position: absolute; left: 0; top: 0;"></canvas>
     </div>
-    <img id="image-preview" style="display:none;">
     <script src="{{ url_for('static', filename='js/oekaki_scripts.js') }}"></script>
 </body>
 </html>
