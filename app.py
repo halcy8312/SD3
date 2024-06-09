@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_file, session, redirect, url_for, jsonify, flash
+from flask import Flask, request, render_template, send_file, session, redirect, url_for, jsonify, flash, make_response
 import os
 import requests
 import time
@@ -183,14 +183,15 @@ def call_api(endpoint, files, data, api_key):
         f"https://api.stability.ai/v2beta/stable-image/edit/{endpoint}",
         headers=headers,
         files=files,
-        data=data
+        data=data,
+        stream=True,  # ストリーミングを有効にする
+        timeout=300  # タイムアウトを設定する
     )
     if response.status_code == 200:
-        return response.content, response.headers['Content-Type']
+        response.raw.decode_content = True
+        return response.raw.read(), response.headers['Content-Type']
     else:
         raise Exception(response.json())
-
-
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
