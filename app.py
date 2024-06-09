@@ -300,7 +300,7 @@ def home():
 def generate():
     api_key = session.get('api_key')
     if not api_key:
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))  # 修正点: url_for('index') -> url_for('home')
 
     if request.method == 'POST':
         prompt = request.form['prompt']
@@ -324,7 +324,7 @@ def generate():
 def upscale():
     api_key = session.get('api_key')
     if not api_key:
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))  # 修正点: url_for('index') -> url_for('home')
 
     if request.method == 'POST':
         image = request.files['image']
@@ -350,7 +350,7 @@ def upscale():
 def erase():
     api_key = session.get('api_key')
     if not api_key:
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))  # 修正点: url_for('index') -> url_for('home')
 
     if request.method == 'POST':
         image = request.files['image']
@@ -372,7 +372,7 @@ def erase():
 def inpaint():
     api_key = session.get('api_key')
     if not api_key:
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))  # 修正点: url_for('index') -> url_for('home')
 
     if request.method == 'POST':
         image = request.files['image']
@@ -396,7 +396,7 @@ def inpaint():
 def outpaint():
     api_key = session.get('api_key')
     if not api_key:
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))  # 修正点: url_for('index') -> url_for('home')
 
     if request.method == 'POST':
         image = request.files['image']
