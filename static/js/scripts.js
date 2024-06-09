@@ -1,5 +1,3 @@
-// script.js
-
 document.addEventListener('DOMContentLoaded', function() {
     function toggleMenu() {
         var menu = document.getElementById("dropdownMenu");
@@ -24,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let backgroundCanvas = document.getElementById('backgroundCanvas');
     let drawingCanvas = document.getElementById('drawingCanvas');
     let ctx = backgroundCanvas ? backgroundCanvas.getContext('2d') : null;
+    let drawingCtx = drawingCanvas ? drawingCanvas.getContext('2d') : null;
     let painting = false;
     let tool = 'pen';
     let penSize = 10;
@@ -31,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let maskCanvas = document.createElement('canvas');
     let maskCtx = maskCanvas.getContext('2d');
 
-    if (backgroundCanvas) {
+    if (backgroundCanvas && drawingCanvas) {
         maskCanvas.width = backgroundCanvas.width;
         maskCanvas.height = backgroundCanvas.height;
     }
@@ -78,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // canvas.htmlで画像を読み込む（edit.htmlから送信された画像を表示）
-    let imgSrc = "{{ image_filename }}";
+    let imgSrc = document.getElementById('image-preview').src;
     if (imgSrc && ctx) {
         let img = new Image();
         img.onload = function() {
@@ -88,13 +87,17 @@ document.addEventListener('DOMContentLoaded', function() {
             maskCanvas.height = img.height;
             ctx.drawImage(img, 0, 0, backgroundCanvas.width, backgroundCanvas.height);
         };
-        img.src = '/static/' + imgSrc;
+        img.src = imgSrc;
     }
 
-    if (backgroundCanvas) {
-        backgroundCanvas.addEventListener('mousedown', startPosition);
-        backgroundCanvas.addEventListener('mouseup', endPosition);
-        backgroundCanvas.addEventListener('mousemove', draw);
+    if (drawingCanvas) {
+        drawingCanvas.addEventListener('mousedown', startPosition);
+        drawingCanvas.addEventListener('mouseup', endPosition);
+        drawingCanvas.addEventListener('mousemove', draw);
+
+        drawingCanvas.addEventListener('touchstart', startPosition);
+        drawingCanvas.addEventListener('touchend', endPosition);
+        drawingCanvas.addEventListener('touchmove', draw);
     }
 
     let penSizeInput = document.getElementById('pen-size');
@@ -127,9 +130,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let saveButton = document.getElementById('save-button');
     if (saveButton) {
         saveButton.addEventListener('click', function() {
-            document.getElementById('mask').value = maskCanvas.toDataURL();
-            document.getElementById('uploaded_image').value = backgroundCanvas.toDataURL();
-            document.getElementById('edit-form').submit();
+            let link = document.createElement('a');
+            link.download = 'drawing.png';
+            link.href = drawingCanvas.toDataURL();
+            link.click();
         });
     }
 
@@ -158,31 +162,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function endPosition() {
         painting = false;
-        if (ctx) {
-            ctx.beginPath();
+        if (drawingCtx) {
+            drawingCtx.beginPath();
             maskCtx.beginPath();
         }
     }
 
     function draw(event) {
         if (!painting) return;
-        if (ctx) {
-            ctx.lineWidth = tool === 'pen' ? penSize : eraserSize;
-            ctx.lineCap = 'round';
-            ctx.strokeStyle = tool === 'pen' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 1)';
+        event.preventDefault();
+        if (drawingCtx) {
+            let rect = drawingCanvas.getBoundingClientRect();
+            let x, y;
+            if (event.touches) {
+                x = event.touches[0].clientX - rect.left;
+                y = event.touches[0].clientY - rect.top;
+            } else {
+                x = event.clientX - rect.left;
+                y = event.clientY - rect.top;
+            }
+
+            drawingCtx.lineWidth = tool === 'pen' ? penSize : eraserSize;
+            drawingCtx.lineCap = 'round';
+            drawingCtx.strokeStyle = tool === 'pen' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 1)';
 
             maskCtx.lineWidth = tool === 'pen' ? penSize : eraserSize;
             maskCtx.lineCap = 'round';
             maskCtx.strokeStyle = tool === 'pen' ? 'white' : 'black';
 
-            let rect = backgroundCanvas.getBoundingClientRect();
-            let x = event.clientX - rect.left;
-            let y = event.clientY - rect.top;
-
-            ctx.lineTo(x, y);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x, y);
+            drawingCtx.lineTo(x, y);
+            drawingCtx.stroke();
+            drawingCtx.beginPath();
+            drawingCtx.moveTo(x, y);
 
             maskCtx.lineTo(x, y);
             maskCtx.stroke();
