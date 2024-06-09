@@ -3,18 +3,22 @@
 document.addEventListener('DOMContentLoaded', function() {
     function toggleMenu() {
         var menu = document.getElementById("dropdownMenu");
-        if (menu.style.display === "block") {
-            menu.style.display = "none";
-        } else {
-            menu.style.display = "block";
+        if (menu) {
+            if (menu.style.display === "block") {
+                menu.style.display = "none";
+            } else {
+                menu.style.display = "block";
+            }
         }
     }
 
     function updateCharacterCount(textareaId, countId) {
         var textarea = document.getElementById(textareaId);
         var countSpan = document.getElementById(countId);
-        var remaining = 10000 - textarea.value.length;
-        countSpan.textContent = "あと" + remaining + "文字";
+        if (textarea && countSpan) {
+            var remaining = 10000 - textarea.value.length;
+            countSpan.textContent = "あと" + remaining + "文字";
+        }
     }
 
     let canvas = document.getElementById('canvas');
@@ -32,33 +36,41 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 画像プレビュー機能追加（edit.html用）
-    document.getElementById('image').addEventListener('change', function(event) {
-        let reader = new FileReader();
-        reader.onload = function() {
-            let img = new Image();
-            img.onload = function() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+    let imageInput = document.getElementById('image');
+    if (imageInput) {
+        imageInput.addEventListener('change', function(event) {
+            let reader = new FileReader();
+            reader.onload = function() {
+                let img = new Image();
+                img.onload = function() {
+                    if (ctx) {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
-                // 画像のサイズに合わせてキャンバスのサイズを調整
-                canvas.width = img.width;
-                canvas.height = img.height;
-                maskCanvas.width = img.width;
-                maskCanvas.height = img.height;
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        // 画像のサイズに合わせてキャンバスのサイズを調整
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        maskCanvas.width = img.width;
+                        maskCanvas.height = img.height;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-                // プレビュー表示
-                document.getElementById('image-preview').src = img.src;
-                document.getElementById('image-preview').style.display = 'block';
+                        // プレビュー表示
+                        let imagePreview = document.getElementById('image-preview');
+                        if (imagePreview) {
+                            imagePreview.src = img.src;
+                            imagePreview.style.display = 'block';
+                        }
+                    }
+                }
+                img.src = reader.result;
             }
-            img.src = reader.result;
-        }
-        reader.readAsDataURL(event.target.files[0]);
-    });
+            reader.readAsDataURL(event.target.files[0]);
+        });
+    }
 
     // canvas.htmlで画像を読み込む（edit.htmlから送信された画像を表示）
     let imgSrc = "{{ image_filename }}";
-    if (imgSrc) {
+    if (imgSrc && ctx) {
         let img = new Image();
         img.onload = function() {
             canvas.width = img.width;
@@ -70,45 +82,65 @@ document.addEventListener('DOMContentLoaded', function() {
         img.src = '/static/' + imgSrc;
     }
 
-    canvas.addEventListener('mousedown', startPosition);
-    canvas.addEventListener('mouseup', endPosition);
-    canvas.addEventListener('mousemove', draw);
+    if (canvas) {
+        canvas.addEventListener('mousedown', startPosition);
+        canvas.addEventListener('mouseup', endPosition);
+        canvas.addEventListener('mousemove', draw);
+    }
 
-    document.getElementById('pen-size').addEventListener('input', function(event) {
-        penSize = event.target.value;
-    });
+    let penSizeInput = document.getElementById('pen-size');
+    if (penSizeInput) {
+        penSizeInput.addEventListener('input', function(event) {
+            penSize = event.target.value;
+        });
+    }
 
-    document.getElementById('eraser-size').addEventListener('input', function(event) {
-        eraserSize = event.target.value;
-    });
+    let eraserSizeInput = document.getElementById('eraser-size');
+    if (eraserSizeInput) {
+        eraserSizeInput.addEventListener('input', function(event) {
+            eraserSize = event.target.value;
+        });
+    }
 
-    document.getElementById('reset-button').addEventListener('click', function() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-        let img = new Image();
-        img.src = document.getElementById('image-preview').src;
-        img.onload = function() {
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        }
-    });
+    let resetButton = document.getElementById('reset-button');
+    if (resetButton && ctx) {
+        resetButton.addEventListener('click', function() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+            let img = new Image();
+            img.src = document.getElementById('image-preview').src;
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            }
+        });
+    }
 
-    document.getElementById('save-button').addEventListener('click', function() {
-        document.getElementById('mask').value = maskCanvas.toDataURL();
-        document.getElementById('uploaded_image').value = canvas.toDataURL();
-        document.getElementById('edit-form').submit();
-    });
+    let saveButton = document.getElementById('save-button');
+    if (saveButton) {
+        saveButton.addEventListener('click', function() {
+            document.getElementById('mask').value = maskCanvas.toDataURL();
+            document.getElementById('uploaded_image').value = canvas.toDataURL();
+            document.getElementById('edit-form').submit();
+        });
+    }
 
-    document.getElementById('pen-button').addEventListener('click', function() {
-        tool = 'pen';
-        document.getElementById('pen-button').classList.add('active');
-        document.getElementById('eraser-button').classList.remove('active');
-    });
+    let penButton = document.getElementById('pen-button');
+    if (penButton) {
+        penButton.addEventListener('click', function() {
+            tool = 'pen';
+            penButton.classList.add('active');
+            document.getElementById('eraser-button').classList.remove('active');
+        });
+    }
 
-    document.getElementById('eraser-button').addEventListener('click', function() {
-        tool = 'eraser';
-        document.getElementById('pen-button').classList.remove('active');
-        document.getElementById('eraser-button').classList.add('active');
-    });
+    let eraserButton = document.getElementById('eraser-button');
+    if (eraserButton) {
+        eraserButton.addEventListener('click', function() {
+            tool = 'eraser';
+            document.getElementById('pen-button').classList.remove('active');
+            eraserButton.classList.add('active');
+        });
+    }
 
     function startPosition(event) {
         painting = true;
@@ -117,33 +149,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function endPosition() {
         painting = false;
-        ctx.beginPath();
-        maskCtx.beginPath();
+        if (ctx) {
+            ctx.beginPath();
+            maskCtx.beginPath();
+        }
     }
 
     function draw(event) {
         if (!painting) return;
-        ctx.lineWidth = tool === 'pen' ? penSize : eraserSize;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = tool === 'pen' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 1)';
+        if (ctx) {
+            ctx.lineWidth = tool === 'pen' ? penSize : eraserSize;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = tool === 'pen' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 1)';
 
-        maskCtx.lineWidth = tool === 'pen' ? penSize : eraserSize;
-        maskCtx.lineCap = 'round';
-        maskCtx.strokeStyle = tool === 'pen' ? 'white' : 'black';
+            maskCtx.lineWidth = tool === 'pen' ? penSize : eraserSize;
+            maskCtx.lineCap = 'round';
+            maskCtx.strokeStyle = tool === 'pen' ? 'white' : 'black';
 
-        let rect = canvas.getBoundingClientRect();
-        let x = event.clientX - rect.left;
-        let y = event.clientY - rect.top;
+            let rect = canvas.getBoundingClientRect();
+            let x = event.clientX - rect.left;
+            let y = event.clientY - rect.top;
 
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
 
-        maskCtx.lineTo(x, y);
-        maskCtx.stroke();
-        maskCtx.beginPath();
-        maskCtx.moveTo(x, y);
+            maskCtx.lineTo(x, y);
+            maskCtx.stroke();
+            maskCtx.beginPath();
+            maskCtx.moveTo(x, y);
+        }
     }
 
     function updateCredits(apiKey) {
@@ -156,15 +192,21 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            document.getElementById('credit-info').innerText = `残りクレジット: ${data.credits}`;
+            let creditInfo = document.getElementById('credit-info');
+            if (creditInfo) {
+                creditInfo.innerText = `残りクレジット: ${data.credits}`;
+            }
         })
         .catch(error => console.error('Error:', error));
     }
 
     // 画像生成後にクレジットを更新
-    document.getElementById('generate-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        // 画像生成処理...
-        updateCredits(apiKey);
-    });
+    let generateForm = document.getElementById('generate-form');
+    if (generateForm) {
+        generateForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            // 画像生成処理...
+            updateCredits(apiKey);
+        });
+    }
 });
