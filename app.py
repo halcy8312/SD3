@@ -468,6 +468,62 @@ def privacy_policy():
 def terms_of_service():
     return render_template('terms_of_service.html')
 
+@app.route('/')
+def index():
+    api_key = session.get('api_key')
+    if not api_key:
+        return render_template('index.html')
+    account_info = get_account_info(api_key)
+    session['credits'] = get_credits(api_key)
+    return render_template('index.html', account_info=account_info, credits=session['credits'])
+
+@app.route('/generate', methods=['POST'])
+def generate():
+    api_key = session.get('api_key')
+    if not api_key:
+        return redirect(url_for('index'))
+
+    prompt = request.form['prompt']
+    negative_prompt = request.form.get('negative_prompt', '')
+    aspect_ratio = request.form['aspect_ratio']
+    style_preset = request.form['style_preset']
+    seed = request.form.get('seed')
+    seed = int(seed) if seed else None
+    output_format = request.form['output_format']
+    model = request.form['model']
+
+    try:
+        image_path = generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key, model, seed, output_format)
+        image_filename = os.path.basename(image_path)
+        session['credits'] = get_credits(api_key)
+        return redirect(url_for('generated', image_filename=image_filename))
+    except Exception as e:
+        return str(e)
+
+@app.route('/upscale', methods=['POST'])
+def upscale():
+    api_key = session.get('api_key')
+    if not api_key:
+        return redirect(url_for('index'))
+
+    image = request.files['image']
+    prompt = request.form.get('prompt', '')
+    negative_prompt = request.form.get('negative_prompt', '')
+    upscale_type = request.form['upscale_type']
+    output_format = request.form['output_format']
+    seed = request.form.get('seed')
+    seed = int(seed) if seed else None
+    creativity = request.form.get('creativity', 0.3)
+    creativity = float(creativity)
+
+    try:
+        image_path = upscale_image(image, prompt, negative_prompt, upscale_type, api_key, seed, output_format, creativity)
+        image_filename = os.path.basename(image_path)
+        session['credits'] = get_credits(api_key)
+        return redirect(url_for('upscaled', image_filename=image_filename))
+    except Exception as e:
+        return str(e)
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
