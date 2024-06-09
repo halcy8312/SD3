@@ -355,6 +355,49 @@ def outpaint():
     result = call_api('outpaint', files, data)
     return result
     
+@app.route('/edit', methods=['GET', 'POST'])
+def edit():
+    api_key = session.get('api_key')
+    if not api_key:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        # ここで編集操作を実行します
+        image = request.files['image']
+        mask = request.files.get('mask')
+        prompt = request.form.get('prompt')
+        negative_prompt = request.form.get('negative_prompt')
+        edit_type = request.form['edit_type']
+        output_format = request.form['output_format']
+        seed = request.form.get('seed')
+        seed = int(seed) if seed else None
+
+        try:
+            if edit_type == 'erase':
+                image_path = erase_image(image, mask, api_key, seed, output_format)
+            elif edit_type == 'inpaint':
+                image_path = inpaint_image(image, prompt, mask, api_key, negative_prompt, seed, output_format)
+            elif edit_type == 'outpaint':
+                directions = {
+                    "left": request.form.get('left'),
+                    "right": request.form.get('right'),
+                    "up": request.form.get('up'),
+                    "down": request.form.get('down')
+                }
+                directions = {k: int(v) for k, v in directions.items() if v}
+                creativity = request.form.get('creativity')
+                creativity = float(creativity) if creativity else None
+                image_path = outpaint_image(image, directions, api_key, prompt, seed, output_format, creativity)
+            else:
+                raise ValueError("Invalid edit type")
+
+            image_filename = os.path.basename(image_path)
+            session['credits'] = get_credits(api_key)
+            return redirect(url_for('result', image_filename=image_filename))
+        except Exception as e:
+            return str(e)
+    return render_template('edit.html', credits=session.get('credits'))
+ 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
