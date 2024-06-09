@@ -26,20 +26,7 @@
         <canvas id="backgroundCanvas" class="canvas"></canvas>
         <canvas id="drawingCanvas" class="canvas"></canvas>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // scripts.jsの内容をここに記述するか、scripts.js内でDOMContentLoadedイベントを使用します
-            var backgroundCanvas = document.getElementById('backgroundCanvas');
-            var drawingCanvas = document.getElementById('drawingCanvas');
-            if (backgroundCanvas && drawingCanvas) {
-                var bgCtx = backgroundCanvas.getContext('2d');
-                var drawCtx = drawingCanvas.getContext('2d');
-                // ここにキャンバスに対する操作を記述
-            } else {
-                console.error('Canvas elements not found');
-            }
-        });
-    </script>
+    <img id="image-preview" style="display:none;">
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 </body>
 </html>

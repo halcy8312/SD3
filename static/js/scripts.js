@@ -21,8 +21,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    let canvas = document.getElementById('canvas');
-    let ctx = canvas ? canvas.getContext('2d') : null;
+    let backgroundCanvas = document.getElementById('backgroundCanvas');
+    let drawingCanvas = document.getElementById('drawingCanvas');
+    let ctx = backgroundCanvas ? backgroundCanvas.getContext('2d') : null;
     let painting = false;
     let tool = 'pen';
     let penSize = 10;
@@ -30,42 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let maskCanvas = document.createElement('canvas');
     let maskCtx = maskCanvas.getContext('2d');
 
-    if (canvas) {
-        maskCanvas.width = canvas.width;
-        maskCanvas.height = canvas.height;
-    }
-
-    // 画像プレビュー機能追加（edit.html用）
-    let imageInput = document.getElementById('image');
-    if (imageInput) {
-        imageInput.addEventListener('change', function(event) {
-            let reader = new FileReader();
-            reader.onload = function() {
-                let img = new Image();
-                img.onload = function() {
-                    if (ctx) {
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-
-                        // 画像のサイズに合わせてキャンバスのサイズを調整
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        maskCanvas.width = img.width;
-                        maskCanvas.height = img.height;
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                        // プレビュー表示
-                        let imagePreview = document.getElementById('image-preview');
-                        if (imagePreview) {
-                            imagePreview.src = img.src;
-                            imagePreview.style.display = 'block';
-                        }
-                    }
-                }
-                img.src = reader.result;
-            }
-            reader.readAsDataURL(event.target.files[0]);
-        });
+    if (backgroundCanvas) {
+        maskCanvas.width = backgroundCanvas.width;
+        maskCanvas.height = backgroundCanvas.height;
     }
 
     // Uploadボタンがファイル入力要素をクリックするように設定
@@ -77,32 +45,35 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         fileInput.addEventListener('change', function(event) {
-            let reader = new FileReader();
-            reader.onload = function() {
-                let img = new Image();
-                img.onload = function() {
-                    if (ctx) {
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+            let file = event.target.files[0];
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = function() {
+                    let img = new Image();
+                    img.onload = function() {
+                        if (ctx) {
+                            ctx.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+                            maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
-                        // 画像のサイズに合わせてキャンバスのサイズを調整
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        maskCanvas.width = img.width;
-                        maskCanvas.height = img.height;
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            // 画像のサイズに合わせてキャンバスのサイズを調整
+                            backgroundCanvas.width = img.width;
+                            backgroundCanvas.height = img.height;
+                            maskCanvas.width = img.width;
+                            maskCanvas.height = img.height;
+                            ctx.drawImage(img, 0, 0, backgroundCanvas.width, backgroundCanvas.height);
 
-                        // プレビュー表示
-                        let imagePreview = document.getElementById('image-preview');
-                        if (imagePreview) {
-                            imagePreview.src = img.src;
-                            imagePreview.style.display = 'block';
+                            // プレビュー表示
+                            let imagePreview = document.getElementById('image-preview');
+                            if (imagePreview) {
+                                imagePreview.src = img.src;
+                                imagePreview.style.display = 'block';
+                            }
                         }
                     }
+                    img.src = reader.result;
                 }
-                img.src = reader.result;
+                reader.readAsDataURL(file);
             }
-            reader.readAsDataURL(event.target.files[0]);
         });
     }
 
@@ -111,19 +82,19 @@ document.addEventListener('DOMContentLoaded', function() {
     if (imgSrc && ctx) {
         let img = new Image();
         img.onload = function() {
-            canvas.width = img.width;
-            canvas.height = img.height;
+            backgroundCanvas.width = img.width;
+            backgroundCanvas.height = img.height;
             maskCanvas.width = img.width;
             maskCanvas.height = img.height;
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, backgroundCanvas.width, backgroundCanvas.height);
         };
         img.src = '/static/' + imgSrc;
     }
 
-    if (canvas) {
-        canvas.addEventListener('mousedown', startPosition);
-        canvas.addEventListener('mouseup', endPosition);
-        canvas.addEventListener('mousemove', draw);
+    if (backgroundCanvas) {
+        backgroundCanvas.addEventListener('mousedown', startPosition);
+        backgroundCanvas.addEventListener('mouseup', endPosition);
+        backgroundCanvas.addEventListener('mousemove', draw);
     }
 
     let penSizeInput = document.getElementById('pen-size');
@@ -143,12 +114,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let resetButton = document.getElementById('reset-button');
     if (resetButton && ctx) {
         resetButton.addEventListener('click', function() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
             maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
             let img = new Image();
             img.src = document.getElementById('image-preview').src;
             img.onload = function() {
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, backgroundCanvas.width, backgroundCanvas.height);
             }
         });
     }
@@ -157,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (saveButton) {
         saveButton.addEventListener('click', function() {
             document.getElementById('mask').value = maskCanvas.toDataURL();
-            document.getElementById('uploaded_image').value = canvas.toDataURL();
+            document.getElementById('uploaded_image').value = backgroundCanvas.toDataURL();
             document.getElementById('edit-form').submit();
         });
     }
@@ -204,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
             maskCtx.lineCap = 'round';
             maskCtx.strokeStyle = tool === 'pen' ? 'white' : 'black';
 
-            let rect = canvas.getBoundingClientRect();
+            let rect = backgroundCanvas.getBoundingClientRect();
             let x = event.clientX - rect.left;
             let y = event.clientY - rect.top;
 
