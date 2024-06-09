@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/oekaki_styles.css') }}">
 </head>
 <body>
     <div class="navbar">
         <a href="{{ url_for('generate') }}" class="nav-button">画像生成</a>
         <a href="{{ url_for('upscale') }}" class="nav-button">アップスケール</a>
-        <a href="{{ url_for('edit') }}" class="nav-button">画像編集（beta）</a>
+        <a href="{{ url_for('oekaki_index') }}" class="nav-button">Oekaki</a>
         <a href="{{ url_for('index') }}" class="nav-button">API</a>
         <a href="{{ url_for('contact') }}" class="nav-button">お問い合わせ</a>
         <a href="{{ url_for('privacy_policy') }}" class="nav-button">プライバシーポリシー</a>
