@@ -351,9 +351,14 @@ def erase():
     files = {'image': image, 'mask': mask}
     data = {'output_format': output_format}
     result, content_type = call_api('erase', files, data, api_key)
-    response = make_response(result)
-    response.headers.set('Content-Type', content_type)
-    return response
+    
+    filename = get_unique_filename(output_format)
+    file_path = f"static/{filename}.{output_format}"
+    with open(file_path, 'wb') as file:
+        file.write(result)
+    
+    return redirect(url_for('edited', image_filename=f"{filename}.{output_format}"))
+
 
 @app.route('/inpaint', methods=['POST'])
 def inpaint():
@@ -367,16 +372,16 @@ def inpaint():
     seed = request.form.get('seed')
     output_format = request.form.get('output_format', 'png')
     files = {'image': image, 'mask': mask}
-    data = {
-        'prompt': prompt,
-        'negative_prompt': negative_prompt,
-        'seed': seed,
-        'output_format': output_format
-    }
+    data = {'prompt': prompt, 'negative_prompt': negative_prompt, 'seed': seed, 'output_format': output_format}
     result, content_type = call_api('inpaint', files, data, api_key)
-    response = make_response(result)
-    response.headers.set('Content-Type', content_type)
-    return response
+    
+    filename = get_unique_filename(output_format)
+    file_path = f"static/{filename}.{output_format}"
+    with open(file_path, 'wb') as file:
+        file.write(result)
+    
+    return redirect(url_for('edited', image_filename=f"{filename}.{output_format}"))
+
 
 
 @app.route('/outpaint', methods=['POST'])
@@ -389,13 +394,21 @@ def outpaint():
     right = request.form.get('right')
     up = request.form.get('up')
     down = request.form.get('down')
-    output_format = 'png'
+    prompt = request.form.get('prompt')
+    seed = request.form.get('seed')
+    creativity = request.form.get('creativity')
+    output_format = request.form.get('output_format', 'png')
     files = {'image': image}
-    data = {'left': left, 'right': right, 'up': up, 'down': down, 'output_format': output_format}
+    data = {'left': left, 'right': right, 'up': up, 'down': down, 'prompt': prompt, 'seed': seed, 'creativity': creativity, 'output_format': output_format}
     result, content_type = call_api('outpaint', files, data, api_key)
-    response = make_response(result)
-    response.headers.set('Content-Type', content_type)
-    return response
+    
+    filename = get_unique_filename(output_format)
+    file_path = f"static/{filename}.{output_format}"
+    with open(file_path, 'wb') as file:
+        file.write(result)
+    
+    return redirect(url_for('edited', image_filename=f"{filename}.{output_format}"))
+
 
     
 @app.route('/edit', methods=['GET', 'POST'])

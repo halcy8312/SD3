@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Edited Image{% endblock %}
+
+{% block content %}
+<h1>Edited Image</h1>
+<img src="{{ url_for('static', filename=image_filename) }}" alt="Edited Image">
+<br>
+<a href="{{ url_for('download_image', filename=image_filename) }}" download>
+    <button>Download Image</button>
+</a>
+{% endblock %}
