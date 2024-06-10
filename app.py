@@ -409,6 +409,10 @@ def outpaint():
     
     return redirect(url_for('edited', image_filename=f"{filename}.{output_format}"))
 
+@app.route('/edited')
+def edited():
+    image_filename = request.args.get('image_filename')
+    return render_template('edited.html', image_filename=image_filename)
 
     
 @app.route('/edit', methods=['GET', 'POST'])
