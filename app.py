@@ -678,6 +678,11 @@ def structure():
     else:
         return jsonify(response.json()), response.status_code
 
+@app.route('/control', methods=['GET'])
+def control():
+    return render_template('control.html')
+
+
 @app.route('/controled')
 def controled():
     image_filename = request.args.get('image_filename')
