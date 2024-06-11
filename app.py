@@ -608,6 +608,10 @@ def image_to_image_result():
 
 @app.route('/sketch', methods=['POST'])
 def sketch():
+    api_key = session.get('api_key')
+    if not api_key:
+        return redirect(url_for('index'))
+    
     prompt = request.form.get('prompt')
     control_strength = request.form.get('control_strength', 0.7)
     seed = request.form.get('seed', 0)
@@ -623,19 +627,27 @@ def sketch():
     }
 
     headers = {
-        'Authorization': f'Bearer {API_KEY}',
+        'Authorization': f'Bearer {api_key}',
         'Accept': 'image/*'
     }
 
     response = requests.post(f'{API_URL}/v2beta/stable-image/control/sketch', headers=headers, files=files, data=data)
 
     if response.status_code == 200:
-        return response.content, 200, {'Content-Type': response.headers['Content-Type']}
+        filename = get_unique_filename("png")
+        file_path = f"static/{filename}.png"
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
+        return redirect(url_for('controled', image_filename=f"{filename}.png"))
     else:
         return jsonify(response.json()), response.status_code
 
 @app.route('/structure', methods=['POST'])
 def structure():
+    api_key = session.get('api_key')
+    if not api_key:
+        return redirect(url_for('index'))
+
     prompt = request.form.get('prompt')
     control_strength = request.form.get('control_strength', 0.7)
     seed = request.form.get('seed', 0)
@@ -651,23 +663,26 @@ def structure():
     }
 
     headers = {
-        'Authorization': f'Bearer {API_KEY}',
+        'Authorization': f'Bearer {api_key}',
         'Accept': 'image/*'
     }
 
     response = requests.post(f'{API_URL}/v2beta/stable-image/control/structure', headers=headers, files=files, data=data)
 
     if response.status_code == 200:
-        return response.content, 200, {'Content-Type': response.headers['Content-Type']}
+        filename = get_unique_filename("png")
+        file_path = f"static/{filename}.png"
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
+        return redirect(url_for('controled', image_filename=f"{filename}.png"))
     else:
         return jsonify(response.json()), response.status_code
 
-@app.route('/control', methods=['GET'])
-def control():
-    return render_template('control.html')
+@app.route('/controled')
+def controled():
+    image_filename = request.args.get('image_filename')
+    return render_template('controled.html', image_filename=image_filename)
 
-if __name__ == '__main__':
-    app.run(debug=True)
     
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
