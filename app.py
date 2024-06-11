@@ -427,8 +427,11 @@ def edited():
 def generate_video_form():
     return render_template('video_generate.html')
 
-@app.route('/generate_video', methods=['POST'])
+@app.route('/generate_video', methods=['GET', 'POST'])
 def generate_video():
+    if request.method == 'GET':
+        return render_template('video_generate.html')
+
     api_key = session.get('api_key')
     if not api_key:
         return redirect(url_for('index'))
@@ -471,8 +474,6 @@ def video_result(generation_id):
         return jsonify({'status': 'complete', 'video_url': video_url})
     else:
         return jsonify({'status': 'error', 'message': response.json()})
-
-
 
     
 @app.route('/edit', methods=['GET', 'POST'])
