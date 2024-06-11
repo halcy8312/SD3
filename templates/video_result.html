@@ -22,9 +22,11 @@ function checkStatus() {
                 const downloadLink = document.getElementById('download_link');
                 downloadLink.href = data.video_url;
                 downloadLink.style.display = 'block';
-            } else {
+            } else if (data.status === 'in-progress') {
                 document.getElementById('status').textContent = 'In-progress, checking again in 10 seconds...';
                 setTimeout(checkStatus, 10000);
+            } else {
+                document.getElementById('status').textContent = 'Error: ' + data.message;
             }
         });
 }

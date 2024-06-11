@@ -459,6 +459,7 @@ def video_result(generation_id):
     else:
         return jsonify({'status': 'error', 'message': response.json()})
 
+
     
 @app.route('/edit', methods=['GET', 'POST'])
 def edit():
