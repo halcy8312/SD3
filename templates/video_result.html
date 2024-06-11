@@ -31,7 +31,7 @@ function checkStatus() {
                 a.click();
                 document.body.removeChild(a);
             } else if (data.status === 'in-progress') {
-                document.getElementById('status').textContent = 'In-progress, checking again in 10 seconds...';
+                document.getElementById('status').textContent = 'In-progress, checking again in 10 seconds...自動更新されない場合は手動でリロードしてください。';
                 setTimeout(checkStatus, 10000);
             } else {
                 document.getElementById('status').textContent = 'Error: ' + data.message;
