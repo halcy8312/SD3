@@ -193,6 +193,32 @@ def call_api(endpoint, files, data, api_key):
     else:
         raise Exception(response.json())
 
+# Ensure the video save folder exists
+video_save_folder = 'static/videos'
+if not os.path.exists(video_save_folder):
+    os.makedirs(video_save_folder)
+
+@app.route('/generate_video', methods=['POST'])
+def generate_video():
+    api_key = session.get('api_key')
+    if not api_key:
+        return redirect(url_for('index'))
+    image = request.files.get('image')
+    cfg_scale = request.form.get('cfg_scale')
+    motion_bucket_id = request.form.get('motion_bucket_id')
+    seed = request.form.get('seed')
+    files = {'image': image}
+    data = {'cfg_scale': cfg_scale, 'motion_bucket_id': motion_bucket_id, 'seed': seed}
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "accept": "application/json"
+    }
+    response = requests.post("https://api.stability.ai/v2beta/image-to-video", headers=headers, files=files, data=data)
+    response_data = response.json()
+    generation_id = response_data['id']
+    return redirect(url_for('video_result_page', generation_id=generation_id))
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     credits = None
@@ -438,6 +464,10 @@ def generate_video():
     generation_id = response_data['id']
     return redirect(url_for('video_result', generation_id=generation_id))
 
+@app.route('/video_result_page/<generation_id>')
+def video_result_page(generation_id):
+    return render_template('video_result.html', generation_id=generation_id)
+
 @app.route('/video_result/<generation_id>', methods=['GET'])
 def video_result(generation_id):
     api_key = session.get('api_key')
@@ -451,7 +481,7 @@ def video_result(generation_id):
     if response.status_code == 202:
         return jsonify({'status': 'in-progress'})
     elif response.status_code == 200:
-        file_path = f"static/videos/{generation_id}.mp4"
+        file_path = os.path.join(video_save_folder, f"{generation_id}.mp4")
         with open(file_path, 'wb') as file:
             file.write(response.content)
         video_url = url_for('static', filename=f'videos/{generation_id}.mp4')
