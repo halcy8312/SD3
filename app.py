@@ -414,6 +414,47 @@ def edited():
     image_filename = request.args.get('image_filename')
     return render_template('edited.html', image_filename=image_filename)
 
+@app.route('/generate_video', methods=['POST'])
+def generate_video():
+    api_key = session.get('api_key')
+    if not api_key:
+        return redirect(url_for('index'))
+    image = request.files.get('image')
+    cfg_scale = request.form.get('cfg_scale')
+    motion_bucket_id = request.form.get('motion_bucket_id')
+    seed = request.form.get('seed')
+    files = {'image': image}
+    data = {'cfg_scale': cfg_scale, 'motion_bucket_id': motion_bucket_id, 'seed': seed}
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "accept": "application/json"
+    }
+    response = requests.post("https://api.stability.ai/v2beta/image-to-video", headers=headers, files=files, data=data)
+    response_data = response.json()
+    generation_id = response_data['id']
+    return redirect(url_for('video_result', generation_id=generation_id))
+
+@app.route('/video_result/<generation_id>', methods=['GET'])
+def video_result(generation_id):
+    api_key = session.get('api_key')
+    if not api_key:
+        return redirect(url_for('index'))
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "accept": "video/*"
+    }
+    response = requests.get(f"https://api.stability.ai/v2beta/image-to-video/result/{generation_id}", headers=headers)
+    if response.status_code == 202:
+        return jsonify({'status': 'in-progress'})
+    elif response.status_code == 200:
+        file_path = f"static/videos/{generation_id}.mp4"
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
+        video_url = url_for('static', filename=f'videos/{generation_id}.mp4')
+        return jsonify({'status': 'complete', 'video_url': video_url})
+    else:
+        return jsonify({'status': 'error', 'message': response.json()})
+
     
 @app.route('/edit', methods=['GET', 'POST'])
 def edit():

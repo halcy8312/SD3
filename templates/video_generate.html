@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Video{% endblock %}
+
+{% block content %}
+<h1>Generate Video</h1>
+<form action="/generate_video" method="post" enctype="multipart/form-data">
+    <label for="image">Image:</label>
+    <input type="file" id="image" name="image" required>
+    <label for="cfg_scale">CFG Scale:</label>
+    <input type="number" step="0.1" id="cfg_scale" name="cfg_scale">
+    <label for="motion_bucket_id">Motion Bucket ID:</label>
+    <input type="number" id="motion_bucket_id" name="motion_bucket_id">
+    <label for="seed">Seed:</label>
+    <input type="number" id="seed" name="seed">
+    <button type="submit">Generate Video</button>
+</form>
+{% endblock %}
