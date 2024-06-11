@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Control機能{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Control機能</h1>
+    
+    <!-- Sketch機能フォーム -->
+    <h2>Sketch機能</h2>
+    <form method="post" id="sketch-form" enctype="multipart/form-data" action="{{ url_for('sketch') }}">
+        <div class="form-group">
+            <label for="sketch-image">画像ファイル:</label>
+            <input type="file" id="sketch-image" name="image" accept="image/*" required><br>
+        </div>
+        <div class="form-group">
+            <label for="sketch-prompt">プロンプト:</label><br>
+            <textarea id="sketch-prompt" name="prompt" rows="3" placeholder="プロンプトをカンマで区切って入力してください"></textarea><br>
+            <span id="sketch-prompt-char-count">あと10000文字</span>
+        </div>
+        <div class="form-group">
+            <label for="sketch-strength">強度 (0.0-1.0):</label><br>
+            <input type="number" id="sketch-strength" name="control_strength" step="0.1" min="0" max="1"><br>
+        </div>
+        <div class="form-group">
+            <label for="sketch-seed">シード（任意）:</label><br>
+            <input type="text" id="sketch-seed" name="seed" placeholder="任意のシード値を入力してください"><br>
+        </div>
+        <button type="submit" class="generate-button">Sketch機能実行</button>
+    </form>
+    
+    <!-- Structure機能フォーム -->
+    <h2>Structure機能</h2>
+    <form method="post" id="structure-form" enctype="multipart/form-data" action="{{ url_for('structure') }}">
+        <div class="form-group">
+            <label for="structure-image">画像ファイル:</label>
+            <input type="file" id="structure-image" name="image" accept="image/*" required><br>
+        </div>
+        <div class="form-group">
+            <label for="structure-prompt">プロンプト:</label><br>
+            <textarea id="structure-prompt" name="prompt" rows="3" placeholder="プロンプトをカンマで区切って入力してください"></textarea><br>
+            <span id="structure-prompt-char-count">あと10000文字</span>
+        </div>
+        <div class="form-group">
+            <label for="structure-strength">強度 (0.0-1.0):</label><br>
+            <input type="number" id="structure-strength" name="control_strength" step="0.1" min="0" max="1"><br>
+        </div>
+        <div class="form-group">
+            <label for="structure-seed">シード（任意）:</label><br>
+            <input type="text" id="structure-seed" name="seed" placeholder="任意のシード値を入力してください"><br>
+        </div>
+        <button type="submit" class="generate-button">Structure機能実行</button>
+    </form>
+</div>
+
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+{% endblock %}

@@ -605,7 +605,70 @@ def image_to_image_route():
 def image_to_image_result():
     image_filename = request.args.get('image_filename')
     return render_template('image_to_image_result.html', image_filename=image_filename)
- 
+
+@app.route('/sketch', methods=['POST'])
+def sketch():
+    prompt = request.form.get('prompt')
+    control_strength = request.form.get('control_strength', 0.7)
+    seed = request.form.get('seed', 0)
+    image = request.files['image']
+
+    files = {
+        'image': image
+    }
+    data = {
+        'prompt': prompt,
+        'control_strength': control_strength,
+        'seed': seed
+    }
+
+    headers = {
+        'Authorization': f'Bearer {API_KEY}',
+        'Accept': 'image/*'
+    }
+
+    response = requests.post(f'{API_URL}/v2beta/stable-image/control/sketch', headers=headers, files=files, data=data)
+
+    if response.status_code == 200:
+        return response.content, 200, {'Content-Type': response.headers['Content-Type']}
+    else:
+        return jsonify(response.json()), response.status_code
+
+@app.route('/structure', methods=['POST'])
+def structure():
+    prompt = request.form.get('prompt')
+    control_strength = request.form.get('control_strength', 0.7)
+    seed = request.form.get('seed', 0)
+    image = request.files['image']
+
+    files = {
+        'image': image
+    }
+    data = {
+        'prompt': prompt,
+        'control_strength': control_strength,
+        'seed': seed
+    }
+
+    headers = {
+        'Authorization': f'Bearer {API_KEY}',
+        'Accept': 'image/*'
+    }
+
+    response = requests.post(f'{API_URL}/v2beta/stable-image/control/structure', headers=headers, files=files, data=data)
+
+    if response.status_code == 200:
+        return response.content, 200, {'Content-Type': response.headers['Content-Type']}
+    else:
+        return jsonify(response.json()), response.status_code
+
+@app.route('/control', methods=['GET'])
+def control():
+    return render_template('control.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
+    
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
