@@ -196,29 +196,7 @@ def call_api(endpoint, files, data, api_key):
 # Ensure the video save folder exists
 video_save_folder = 'static/videos'
 if not os.path.exists(video_save_folder):
-    os.makedirs(video_save_folder)
-
-
-@app.route('/generate_video', methods=['POST'])
-def generate_video():
-    api_key = session.get('api_key')
-    if not api_key:
-        return redirect(url_for('index'))
-    image = request.files.get('image')
-    cfg_scale = request.form.get('cfg_scale')
-    motion_bucket_id = request.form.get('motion_bucket_id')
-    seed = request.form.get('seed')
-    files = {'image': image}
-    data = {'cfg_scale': cfg_scale, 'motion_bucket_id': motion_bucket_id, 'seed': seed}
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "accept": "application/json"
-    }
-    response = requests.post("https://api.stability.ai/v2beta/image-to-video", headers=headers, files=files, data=data)
-    response_data = response.json()
-    generation_id = response_data['id']
-    return redirect(url_for('video_result_page', generation_id=generation_id))
-
+    os.makedirs(video_save_folder) 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
