@@ -8,7 +8,7 @@
 <!-- Erase Form -->
 <h2>消去機能</h2>
 <p>画像の特定の部分を消去します。マスクを使用して消去部分を指定できます。最大ファイルサイズは10MBです。</p>
-<form action="/erase" method="post" enctype="multipart/form-data">
+<form action="/erase" method="post" id="erase-form" enctype="multipart/form-data">
     <label for="erase-image">画像ファイルを選択:</label>
     <input type="file" id="erase-image" name="image" required>
     <label for="erase-mask">マスクファイルを選択（任意）:</label>
@@ -19,15 +19,15 @@
 <!-- Inpaint Form -->
 <h2>塗り直し機能</h2>
 <p>画像の特定の部分を塗り直します。マスクとプロンプトを使用して、塗り直し部分を指定できます。最大ファイルサイズは10MBです。</p>
-<form action="/inpaint" method="post" enctype="multipart/form-data">
+<form action="/inpaint" method="post" id="inpaint-form" enctype="multipart/form-data">
     <label for="inpaint-image">画像ファイルを選択:</label>
     <input type="file" id="inpaint-image" name="image" required>
     <label for="inpaint-mask">マスクファイルを選択:</label>
     <input type="file" id="inpaint-mask" name="mask">
     <label for="inpaint-prompt">プロンプト:</label>
     <input type="text" id="inpaint-prompt" name="prompt" placeholder="塗り直す内容を入力" required>
-    <label for="inpaint-negative-prompt">ネガティブプロンプト（任意）:</label>
-    <input type="text" id="inpaint-negative-prompt" name="negative_prompt" placeholder="含めたくない内容を入力">
+    <label for="inpaint-negative_prompt">ネガティブプロンプト（任意）:</label>
+    <input type="text" id="inpaint-negative_prompt" name="negative_prompt" placeholder="含めたくない内容を入力">
     <label for="inpaint-seed">シード値（任意）:</label>
     <input type="number" id="inpaint-seed" name="seed" placeholder="シード値を入力">
     <label for="inpaint-output-format">出力形式:</label>
@@ -42,7 +42,7 @@
 <!-- Outpaint Form -->
 <h2>拡張塗り直し機能</h2>
 <p>画像の外側を拡張して塗り直します。各辺の拡張範囲とプロンプトを指定できます。最大ファイルサイズは10MBです。</p>
-<form action="/outpaint" method="post" enctype="multipart/form-data">
+<form action="/outpaint" method="post" id="outpaint-form" enctype="multipart/form-data">
     <label for="outpaint-image">画像ファイルを選択:</label>
     <input type="file" id="outpaint-image" name="image" required>
     <label for="outpaint-left">左方向の拡張範囲（0-2000ピクセル）:</label>
@@ -62,11 +62,41 @@
     <button type="submit">拡張塗り直し</button>
 </form>
 
-<!-- エラーメッセージの表示 -->
-{% if error_message %}
-<div class="error">
-    <p>{{ error_message }}</p>
-</div>
-{% endif %}
+<!-- スクリプトを貼り付ける場所 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ページロード時にプロンプトを復元
+    const fromPage = 'edit';
+    fetch(`/get_prompt?from_page=${fromPage}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('inpaint-prompt').value = data.prompt;
+            document.getElementById('inpaint-negative_prompt').value = data.negative_prompt;
+        });
 
+    document.getElementById('inpaint-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const prompt = document.getElementById('inpaint-prompt').value;
+        const negativePrompt = document.getElementById('inpaint-negative_prompt').value;
+
+        fetch('/save_prompt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                prompt: prompt,
+                negative_prompt: negativePrompt,
+                from_page: fromPage
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                this.submit(); // プロンプト保存後にフォームを送信
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

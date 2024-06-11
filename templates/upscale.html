@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container">
     <h1>画像アップスケール（保守的および創造的動作します。）</h1>
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" id="upscale-form" enctype="multipart/form-data">
         <div class="form-group">
             <label for="image">画像ファイル:</label><br>
             <input type="file" id="image" name="image" accept="image/*" required><br>
@@ -35,13 +35,4 @@
         </div>
         <div class="form-group">
             <label for="seed">シード（任意）:</label><br>
-            <input type="text" id="seed" name="seed" placeholder="任意のシード値を入力してください"><br>
-        </div>
-        <div class="form-group">
-            <label for="creativity">クリエイティビティ（0.2〜0.35）:</label><br>
-            <input type="text" id="creativity" name="creativity" placeholder="デフォルトは0.3"><br>
-        </div>
-        <button type="submit" class="generate-button">アップスケール</button>
-    </form>
-</div>
-{% endblock %}
+            <input type="text" id

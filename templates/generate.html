@@ -79,6 +79,43 @@
         <p class="note">「画像生成」ボタンをクリックすると、選択したモデルと設定に基づいて画像が生成されます。成功した生成のみクレジットが消費されます。</p>
     </form>
 </div>
-<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
-{% endblock %}
 
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fromPage = 'generate';  // ページの識別用変数
+
+    // ページロード時にプロンプトを復元
+    fetch(`/get_prompt?from_page=${fromPage}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('prompt').value = data.prompt;
+            document.getElementById('negative_prompt').value = data.negative_prompt;
+        });
+
+    document.getElementById('generate-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const prompt = document.getElementById('prompt').value;
+        const negativePrompt = document.getElementById('negative_prompt').value;
+
+        fetch('/save_prompt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                prompt: prompt,
+                negative_prompt: negativePrompt,
+                from_page: fromPage
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                event.target.submit(); // プロンプト保存後にフォームを送信
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

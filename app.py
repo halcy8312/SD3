@@ -519,6 +519,24 @@ def edit():
             return str(e)
     return render_template('edit.html', credits=session.get('credits'))
  
+@app.route('/save_prompt', methods=['POST'])
+def save_prompt():
+    data = request.json
+    session['prompt'] = data.get('prompt')
+    session['negative_prompt'] = data.get('negative_prompt')
+    session['from_page'] = data.get('from_page')
+    return jsonify({'status': 'success'})
+
+@app.route('/get_prompt', methods=['GET'])
+def get_prompt():
+    from_page = request.args.get('from_page')
+    if session.get('from_page') == from_page:
+        return jsonify({
+            'prompt': session.get('prompt', ''),
+            'negative_prompt': session.get('negative_prompt', '')
+        })
+    return jsonify({'prompt': '', 'negative_prompt': ''})
+ 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
