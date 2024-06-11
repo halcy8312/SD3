@@ -606,12 +606,15 @@ def image_to_image_result():
     image_filename = request.args.get('image_filename')
     return render_template('image_to_image_result.html', image_filename=image_filename)
 
+# Define the API_URL and ensure API_KEY is obtained correctly
+API_URL = "https://api.stability.ai"  # StabilityAIのAPIベースURL
+
 @app.route('/sketch', methods=['POST'])
 def sketch():
     api_key = session.get('api_key')
     if not api_key:
         return redirect(url_for('index'))
-    
+
     prompt = request.form.get('prompt')
     control_strength = request.form.get('control_strength', 0.7)
     seed = request.form.get('seed', 0)
@@ -634,11 +637,11 @@ def sketch():
     response = requests.post(f'{API_URL}/v2beta/stable-image/control/sketch', headers=headers, files=files, data=data)
 
     if response.status_code == 200:
-        filename = get_unique_filename("png")
-        file_path = f"static/{filename}.png"
+        file_name = get_unique_filename("png")
+        file_path = f"static/{file_name}.png"
         with open(file_path, 'wb') as file:
             file.write(response.content)
-        return redirect(url_for('controled', image_filename=f"{filename}.png"))
+        return redirect(url_for('controled', image_filename=file_name))
     else:
         return jsonify(response.json()), response.status_code
 
@@ -670,11 +673,11 @@ def structure():
     response = requests.post(f'{API_URL}/v2beta/stable-image/control/structure', headers=headers, files=files, data=data)
 
     if response.status_code == 200:
-        filename = get_unique_filename("png")
-        file_path = f"static/{filename}.png"
+        file_name = get_unique_filename("png")
+        file_path = f"static/{file_name}.png"
         with open(file_path, 'wb') as file:
             file.write(response.content)
-        return redirect(url_for('controled', image_filename=f"{filename}.png"))
+        return redirect(url_for('controled', image_filename=file_name))
     else:
         return jsonify(response.json()), response.status_code
 
