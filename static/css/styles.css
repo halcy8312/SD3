@@ -10,9 +10,9 @@ body {
     background-color: #333;
     padding: 10px;
     display: flex;
-    justify-content: space-between; /* 項目間のスペースを調整 */
-    flex-wrap: nowrap; /* 子要素を横並びに保つ */
-    overflow-x: auto; /* 横スクロールを許可 */
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    overflow-x: auto;
 }
 
 .nav-button {
@@ -23,7 +23,7 @@ body {
     display: inline-block;
     font-size: 10px;
     cursor: pointer;
-    white-space: nowrap; /* テキストを折り返さないようにする */
+    white-space: nowrap;
 }
 
 .nav-button:hover {
@@ -36,39 +36,47 @@ body {
     margin: 0 auto;
     background: #fff;
     padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
 }
 
 input[type="text"],
 textarea,
 select,
 input[type="file"] {
-    width: 90%;
-    padding: 10px;
-    margin-bottom: 10px;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
 }
 
 button.generate-button, button.edit-button {
     background: #007bff;
     color: #fff;
     border: none;
-    padding: 10px 15px;
+    padding: 12px 20px;
     cursor: pointer;
-    float: right;
-    border-radius: 8px; /* 角を丸くする */
-    margin-top: -20px;
+    border-radius: 8px;
+    margin-top: 10px;
+    transition: background 0.3s ease;
 }
 
 button.generate-button:hover, button.edit-button:hover {
@@ -76,36 +84,22 @@ button.generate-button:hover, button.edit-button:hover {
 }
 
 .button-group {
-    margin-top: -20px; /* 調整したい高さに応じてマイナスの値を変更 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-/* メディアクエリを追加して、小さな画面ではハンバーガーメニューに変更 */
-@media (max-width: 600px) {
-    .navbar {
-        flex-direction: column; /* 縦並びに変更 */
-        align-items: flex-start;
-    }
-
-    .nav-button {
-        padding: 10px;
-        width: 100%; /* 横幅いっぱいに広げる */
-    }
+.char-count {
+    font-size: 0.9em;
+    color: #888;
+    text-align: right;
 }
 
-.download-button, .back-button {
-    background: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    text-decoration: none;
-    cursor: pointer;
-    border-radius: 8px;
-    display: inline-block;
-    margin-top: 10px;
-}
-
-.download-button:hover, .back-button:hover {
-    background: #0056b3;
+.note {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: -10px;
+    margin-bottom: 10px;
 }
 
 .credit-info {
@@ -117,83 +111,24 @@ button.generate-button:hover, button.edit-button:hover {
     border-radius: 4px;
 }
 
-.account-info {
-    padding: 10px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    color: #333;
-    margin-top: 20px;
-    border-radius: 4px;
-}
+@media (max-width: 600px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 
-.account-info h2 {
-    margin-top: 0;
-}
+    .nav-button {
+        padding: 10px;
+        width: 100%;
+    }
 
-.account-info p {
-    margin: 5px 0;
-}
+    .button-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
 
-.account-info img {
-    max-width: 100px;
-    border-radius: 50%;
-}
-
-.credits {
-    padding: 10px;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    color: #333;
-    border-radius: 4px;
-    margin-left: 10px;
-    display: inline-block;
-}
-
-.char-count {
-    font-size: 0.9em;
-    color: #888;
-    margin-top: -10px;
-    display: block;
-    text-align: right;
-}
-
-.canvas-container {
-    margin-top: 20px;
-}
-
-canvas {
-    border: 1px solid #ccc;
-    width: 100%;
-    max-width: 800px;
-    height: auto;
-}
-
-.tools {
-    margin-top: 10px;
-    display: flex;
-    justify-content: space-around;
-}
-
-#pen-size, #eraser-size {
-    width: 100px;
-}
-
-button#pen-button, button#eraser-button, button#reset-button, button#save-button {
-    background: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    border-radius: 8px;
-}
-
-button#pen-button:hover, button#eraser-button:hover, button#reset-button:hover, button#save-button:hover {
-    background: #0056b3;
-}
-
-canvas {
-    border: 1px solid #ccc;
-    display: block;
-    margin: 20px 0;
-    max-width: 100%;
+    button.generate-button, button.edit-button {
+        width: 100%;
+        margin-top: 10px;
+    }
 }
