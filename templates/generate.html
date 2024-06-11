@@ -15,11 +15,13 @@
             <label for="prompt">プロンプト:</label><br>
             <textarea id="prompt" name="prompt" rows="3" placeholder="プロンプトをカンマで区切って入力してください" oninput="updateCharacterCount('prompt', 'prompt-char-count')"></textarea><br>
             <span id="prompt-char-count">あと10000文字</span>
+            <p class="note">画像生成に望む内容を具体的に記述してください。詳細なプロンプトが良い結果をもたらします。</p>
         </div>
         <div class="form-group">
             <label for="negative_prompt">ネガティブプロンプト:</label><br>
             <textarea id="negative_prompt" name="negative_prompt" rows="3" placeholder="ネガティブプロンプトをカンマで区切って入力してください" oninput="updateCharacterCount('negative_prompt', 'negative-prompt-char-count')"></textarea><br>
             <span id="negative-prompt-char-count">あと10000文字</span>
+            <p class="note">出力画像に含めたくない内容を記述してください。特定の要素を除外したい場合に使用します。</p>
         </div>
         <div class="form-group">
             <label for="aspect_ratio">アスペクト比:</label><br>
@@ -34,6 +36,7 @@
                 <option value="9:16">9:16</option>
                 <option value="9:21">9:21（Ultraではエラーが出ます。）</option>
             </select><br>
+            <p class="note">生成する画像のアスペクト比を選択してください。</p>
         </div>
         <div class="form-group">
             <label for="style_preset">スタイルプリセット:</label><br>
@@ -56,20 +59,24 @@
                 <option value="pixel-art">pixel-art</option>
                 <option value="tile-texture">tile-texture</option>
             </select><br>
+            <p class="note">生成画像のスタイルを選択してください。</p>
         </div>
         <div class="form-group">
             <label for="model">モデル:</label><br>
             <select id="model" name="model">
-                <option value="sd3">sd3</option>
+                <option value="sd3">sd3（6.5クレジット/成功生成）</option>
                 <option value="sd3-turbo">sd3-turbo（動作しなくなった..）</option>
-                <option value="ultra">ultra</option>
+                <option value="ultra">ultra（8クレジット/成功生成）</option>
             </select><br>
+            <p class="note">使用するモデルを選択してください。Ultraモデルは8クレジットが必要です。</p>
         </div>
         <div class="form-group">
             <label for="seed">シード（任意）:</label><br>
             <input type="text" id="seed" name="seed" placeholder="任意のシード値を入力してください"><br>
+            <p class="note">生成に使用する乱数シードを指定できます。指定しない場合はランダムになります。</p>
         </div>
         <button type="submit" class="generate-button">画像生成</button>
+        <p class="note">「画像生成」ボタンをクリックすると、選択したモデルと設定に基づいて画像が生成されます。成功した生成のみクレジットが消費されます。</p>
     </form>
 </div>
 <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
