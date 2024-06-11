@@ -202,6 +202,46 @@ video_save_folder = 'static/videos'
 if not os.path.exists(video_save_folder):
     os.makedirs(video_save_folder) 
 
+def image_to_image(image, prompt, negative_prompt, api_key, model, seed=None, output_format="png"):
+    if model == "ultra":
+        url = "https://api.stability.ai/v2beta/stable-image/image-to-image/ultra"
+    elif model == "sd3":
+        url = "https://api.stability.ai/v2beta/stable-image/image-to-image/sd3"
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "accept": "image/*"
+    }
+    files = {
+        "image": image,
+        "prompt": (None, prompt),
+        "negative_prompt": (None, negative_prompt),
+        "output_format": (None, output_format),
+        "model": (None, model)
+    }
+    if seed is not None:
+        files["seed"] = (None, str(seed))
+
+    try:
+        response = requests.post(url, headers=headers, files=files)
+        response.raise_for_status()
+        file_name = get_unique_filename(output_format)
+        file_path = f"static/{file_name}.{output_format}"
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
+        return file_path
+    except requests.exceptions.HTTPError as http_err:
+        try:
+            error_message = response.json()
+        except ValueError:
+            error_message = response.text
+        print(f"HTTP error occurred: {http_err}, Response: {error_message}")
+        raise Exception(f"Error: {response.status_code}, Response: {error_message}")
+    except Exception as err:
+        print(f"An error occurred: {err}")
+        raise Exception(f"An unexpected error occurred: {err}")
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     credits = None
@@ -536,6 +576,35 @@ def get_prompt():
             'negative_prompt': session.get('negative_prompt', '')
         })
     return jsonify({'prompt': '', 'negative_prompt': ''})
+ 
+@app.route('/image_to_image', methods=['GET', 'POST'])
+def image_to_image_route():
+    api_key = session.get('api_key')
+    if not api_key:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        image = request.files['image']
+        prompt = request.form['prompt']
+        negative_prompt = request.form['negative_prompt']
+        model = request.form['model']
+        seed = request.form.get('seed')
+        seed = int(seed) if seed else None
+        output_format = request.form.get('output_format', 'png')
+
+        try:
+            image_path = image_to_image(image, prompt, negative_prompt, api_key, model, seed, output_format)
+            image_filename = os.path.basename(image_path)
+            session['credits'] = get_credits(api_key)
+            return redirect(url_for('image_to_image_result', image_filename=image_filename))
+        except Exception as e:
+            return str(e)
+    return render_template('image_to_image.html', credits=session.get('credits'))
+
+@app.route('/image_to_image_result')
+def image_to_image_result():
+    image_filename = request.args.get('image_filename')
+    return render_template('image_to_image_result.html', image_filename=image_filename)
  
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

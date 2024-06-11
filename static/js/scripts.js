@@ -111,6 +111,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // 新しいフィールド image_to_image に対するファイルアップロードのハンドリングを追加
+    let imageToImageInput = document.getElementById('image_to_image');
+    if (imageToImageInput) {
+        imageToImageInput.addEventListener('change', function(event) {
+            let file = event.target.files[0];
+            if (file && checkFileSize(file, 10)) {
+                let reader = new FileReader();
+                reader.onload = function() {
+                    let img = new Image();
+                    img.onload = function() {
+                        if (ctx) {
+                            ctx.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+                            maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+
+                            // 画像のサイズに合わせてキャンバスのサイズを調整
+                            backgroundCanvas.width = img.width;
+                            backgroundCanvas.height = img.height;
+                            maskCanvas.width = img.width;
+                            maskCanvas.height = img.height;
+                            ctx.drawImage(img, 0, 0, backgroundCanvas.width, backgroundCanvas.height);
+
+                            // プレビュー表示
+                            let imagePreview = document.getElementById('image-preview');
+                            if (imagePreview) {
+                                imagePreview.src = img.src;
+                                imagePreview.style.display = 'block';
+                            }
+                        }
+                    }
+                    img.src = reader.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
     // canvas.htmlで画像を読み込む（edit.htmlから送信された画像を表示）
     let imgSrc = document.getElementById('image-preview').src;
     if (imgSrc && ctx) {
