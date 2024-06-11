@@ -1,61 +1,72 @@
 {% extends "base.html" %}
 
-{% block title %}Image Editing{% endblock %}
+{% block title %}画像編集{% endblock %}
 
 {% block content %}
-<h1>SD3 Image Editing</h1>
+<h1>SD3 画像編集</h1>
 
 <!-- Erase Form -->
-<h2>Erase</h2>
+<h2>消去機能</h2>
+<p>画像の特定の部分を消去します。マスクを使用して消去部分を指定できます。最大ファイルサイズは10MBです。</p>
 <form action="/erase" method="post" enctype="multipart/form-data">
-    <label for="erase-image">Image:</label>
+    <label for="erase-image">画像ファイルを選択:</label>
     <input type="file" id="erase-image" name="image" required>
-    <label for="erase-mask">Mask:</label>
+    <label for="erase-mask">マスクファイルを選択（任意）:</label>
     <input type="file" id="erase-mask" name="mask">
-    <button type="submit">Erase</button>
+    <button type="submit">消去</button>
 </form>
 
 <!-- Inpaint Form -->
-<h2>Inpaint</h2>
+<h2>塗り直し機能</h2>
+<p>画像の特定の部分を塗り直します。マスクとプロンプトを使用して、塗り直し部分を指定できます。最大ファイルサイズは10MBです。</p>
 <form action="/inpaint" method="post" enctype="multipart/form-data">
-    <label for="inpaint-image">Image:</label>
+    <label for="inpaint-image">画像ファイルを選択:</label>
     <input type="file" id="inpaint-image" name="image" required>
-    <label for="inpaint-mask">Mask:</label>
+    <label for="inpaint-mask">マスクファイルを選択:</label>
     <input type="file" id="inpaint-mask" name="mask">
-    <label for="inpaint-prompt">Prompt:</label>
-    <input type="text" id="inpaint-prompt" name="prompt" required>
-    <label for="inpaint-negative-prompt">Negative Prompt:</label>
-    <input type="text" id="inpaint-negative-prompt" name="negative_prompt">
-    <label for="inpaint-seed">Seed:</label>
-    <input type="number" id="inpaint-seed" name="seed">
-    <label for="inpaint-output-format">Output Format:</label>
+    <label for="inpaint-prompt">プロンプト:</label>
+    <input type="text" id="inpaint-prompt" name="prompt" placeholder="塗り直す内容を入力" required>
+    <label for="inpaint-negative-prompt">ネガティブプロンプト（任意）:</label>
+    <input type="text" id="inpaint-negative-prompt" name="negative_prompt" placeholder="含めたくない内容を入力">
+    <label for="inpaint-seed">シード値（任意）:</label>
+    <input type="number" id="inpaint-seed" name="seed" placeholder="シード値を入力">
+    <label for="inpaint-output-format">出力形式:</label>
     <select id="inpaint-output-format" name="output_format">
         <option value="png">PNG</option>
         <option value="jpeg">JPEG</option>
         <option value="webp">WEBP</option>
     </select>
-    <button type="submit">Inpaint</button>
+    <button type="submit">塗り直し</button>
 </form>
 
 <!-- Outpaint Form -->
-<h2>Outpaint</h2>
+<h2>拡張塗り直し機能</h2>
+<p>画像の外側を拡張して塗り直します。各辺の拡張範囲とプロンプトを指定できます。最大ファイルサイズは10MBです。</p>
 <form action="/outpaint" method="post" enctype="multipart/form-data">
-    <label for="outpaint-image">Image:</label>
+    <label for="outpaint-image">画像ファイルを選択:</label>
     <input type="file" id="outpaint-image" name="image" required>
-    <label for="outpaint-left">Left (0-2000):</label>
-    <input type="number" id="outpaint-left" name="left" min="0" max="2000">
-    <label for="outpaint-right">Right (0-2000):</label>
-    <input type="number" id="outpaint-right" name="right" min="0" max="2000">
-    <label for="outpaint-up">Up (0-2000):</label>
-    <input type="number" id="outpaint-up" name="up" min="0" max="2000">
-    <label for="outpaint-down">Down (0-2000):</label>
-    <input type="number" id="outpaint-down" name="down" min="0" max="2000">
-    <label for="outpaint-prompt">Prompt:</label>
-    <input type="text" id="outpaint-prompt" name="prompt">
-    <label for="outpaint-seed">Seed:</label>
-    <input type="number" id="outpaint-seed" name="seed">
-    <label for="outpaint-creativity">Creativity (0.0-1.0):</label>
-    <input type="number" step="0.1" min="0" max="1" id="outpaint-creativity" name="creativity">
-    <button type="submit">Outpaint</button>
+    <label for="outpaint-left">左方向の拡張範囲（0-2000ピクセル）:</label>
+    <input type="number" id="outpaint-left" name="left" min="0" max="2000" placeholder="左方向のピクセル数">
+    <label for="outpaint-right">右方向の拡張範囲（0-2000ピクセル）:</label>
+    <input type="number" id="outpaint-right" name="right" min="0" max="2000" placeholder="右方向のピクセル数">
+    <label for="outpaint-up">上方向の拡張範囲（0-2000ピクセル）:</label>
+    <input type="number" id="outpaint-up" name="up" min="0" max="2000" placeholder="上方向のピクセル数">
+    <label for="outpaint-down">下方向の拡張範囲（0-2000ピクセル）:</label>
+    <input type="number" id="outpaint-down" name="down" min="0" max="2000" placeholder="下方向のピクセル数">
+    <label for="outpaint-prompt">プロンプト:</label>
+    <input type="text" id="outpaint-prompt" name="prompt" placeholder="拡張部分の内容を入力">
+    <label for="outpaint-seed">シード値（任意）:</label>
+    <input type="number" id="outpaint-seed" name="seed" placeholder="シード値を入力">
+    <label for="outpaint-creativity">クリエイティビティ（0.0-1.0）:</label>
+    <input type="number" step="0.1" min="0" max="1" id="outpaint-creativity" name="creativity" placeholder="クリエイティビティを入力">
+    <button type="submit">拡張塗り直し</button>
 </form>
+
+<!-- エラーメッセージの表示 -->
+{% if error_message %}
+<div class="error">
+    <p>{{ error_message }}</p>
+</div>
+{% endif %}
+
 {% endblock %}

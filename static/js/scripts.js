@@ -35,6 +35,41 @@ document.addEventListener('DOMContentLoaded', function() {
         maskCanvas.height = backgroundCanvas.height;
     }
 
+    // Undo/Redo機能
+    let undoStack = [];
+    let redoStack = [];
+
+    function saveState() {
+        undoStack.push(drawingCanvas.toDataURL());
+        redoStack = []; // Redoスタックをクリア
+    }
+
+    function undo() {
+        if (undoStack.length > 0) {
+            redoStack.push(drawingCanvas.toDataURL());
+            let state = undoStack.pop();
+            let img = new Image();
+            img.src = state;
+            img.onload = function() {
+                drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+                drawingCtx.drawImage(img, 0, 0, drawingCanvas.width, drawingCanvas.height);
+            }
+        }
+    }
+
+    function redo() {
+        if (redoStack.length > 0) {
+            undoStack.push(drawingCanvas.toDataURL());
+            let state = redoStack.pop();
+            let img = new Image();
+            img.src = state;
+            img.onload = function() {
+                drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+                drawingCtx.drawImage(img, 0, 0, drawingCanvas.width, drawingCanvas.height);
+            }
+        }
+    }
+
     // Uploadボタンがファイル入力要素をクリックするように設定
     let uploadButton = document.getElementById('upload');
     let fileInput = document.getElementById('fileInput');
@@ -45,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         fileInput.addEventListener('change', function(event) {
             let file = event.target.files[0];
-            if (file) {
+            if (file && checkFileSize(file, 10)) {
                 let reader = new FileReader();
                 reader.onload = function() {
                     let img = new Image();
@@ -143,6 +178,8 @@ document.addEventListener('DOMContentLoaded', function() {
             tool = 'pen';
             penButton.classList.add('active');
             document.getElementById('eraser-button').classList.remove('active');
+            drawingCanvas.classList.add('canvas-cursor-pen');
+            drawingCanvas.classList.remove('canvas-cursor-eraser');
         });
     }
 
@@ -152,11 +189,14 @@ document.addEventListener('DOMContentLoaded', function() {
             tool = 'eraser';
             document.getElementById('pen-button').classList.remove('active');
             eraserButton.classList.add('active');
+            drawingCanvas.classList.add('canvas-cursor-eraser');
+            drawingCanvas.classList.remove('canvas-cursor-pen');
         });
     }
 
     function startPosition(event) {
         painting = true;
+        saveState();
         draw(event);
     }
 
@@ -225,8 +265,77 @@ document.addEventListener('DOMContentLoaded', function() {
     if (generateForm) {
         generateForm.addEventListener('submit', function(event) {
             event.preventDefault();
+            showLoadingIndicator(true);
             // 画像生成処理...
             updateCredits(apiKey);
+            showLoadingIndicator(false);
         });
+    }
+
+    // ファイルのドラッグ＆ドロップ機能
+    let dropArea = document.getElementById('drop-area');
+
+    dropArea.addEventListener('dragover', function(event) {
+        event.preventDefault();
+        dropArea.classList.add('dragging');
+    });
+
+    dropArea.addEventListener('dragleave', function(event) {
+        event.preventDefault();
+        dropArea.classList.remove('dragging');
+    });
+
+    dropArea.addEventListener('drop', function(event) {
+        event.preventDefault();
+        dropArea.classList.remove('dragging');
+        let files = event.dataTransfer.files;
+        handleFiles(files);
+    });
+
+    function handleFiles(files) {
+        let file = files[0];
+        if (file && checkFileSize(file, 10)) {
+            let reader = new FileReader();
+            reader.onload = function() {
+                let img = new Image();
+                img.onload = function() {
+                    ctx.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+                    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+                    backgroundCanvas.width = img.width;
+                    backgroundCanvas.height = img.height;
+                    maskCanvas.width = img.width;
+                    maskCanvas.height = img.height;
+                    ctx.drawImage(img, 0, 0, backgroundCanvas.width, backgroundCanvas.height);
+                    document.getElementById('image-preview').src = img.src;
+                }
+                img.src = reader.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // エラーメッセージの表示
+    function showError(message) {
+        let errorContainer = document.getElementById('error-container');
+        if (errorContainer) {
+            errorContainer.innerText = message;
+            errorContainer.style.display = 'block';
+        }
+    }
+
+    function checkFileSize(file, maxSizeMB) {
+        var maxSize = maxSizeMB * 1024 * 1024;
+        if (file.size > maxSize) {
+            showError('ファイルサイズが大きすぎます。最大サイズは ' + maxSizeMB + ' MB です。');
+            return false;
+        }
+        return true;
+    }
+
+    function showLoadingIndicator(show) {
+        var loadingIndicator = document.getElementById('loading-indicator');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = show ? 'block' : 'none';
+        }
     }
 });
