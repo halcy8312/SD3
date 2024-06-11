@@ -7,7 +7,7 @@
 <p>Generation ID: {{ generation_id }}</p>
 <p>Status: <span id="status">Checking...</span></p>
 <video id="video" controls style="display: none;"></video>
-<a id="download_link" href="" download style="display: none;"><button>Download Video</button></a>
+<a id="download_link" href="" download="generated_video.mp4" style="display: none;"><button>Download Video</button></a>
 
 <script>
 function checkStatus() {
@@ -26,7 +26,7 @@ function checkStatus() {
                 // 自動ダウンロード
                 const a = document.createElement('a');
                 a.href = data.video_url;
-                a.download = 'video.mp4';
+                a.download = 'generated_video.mp4';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);

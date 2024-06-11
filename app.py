@@ -193,6 +193,10 @@ def call_api(endpoint, files, data, api_key):
     else:
         raise Exception(response.json())
 
+# Ensure the upload folder exists
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+
 # Ensure the video save folder exists
 video_save_folder = 'static/videos'
 if not os.path.exists(video_save_folder):
@@ -419,7 +423,7 @@ def edited():
     image_filename = request.args.get('image_filename')
     return render_template('edited.html', image_filename=image_filename)
 
-@app.route('/generate_video', methods=['GET'])
+@app.route('/generate_video_form', methods=['GET'])
 def generate_video_form():
     return render_template('video_generate.html')
 
@@ -441,7 +445,7 @@ def generate_video():
     response = requests.post("https://api.stability.ai/v2beta/image-to-video", headers=headers, files=files, data=data)
     response_data = response.json()
     generation_id = response_data['id']
-    return redirect(url_for('video_result', generation_id=generation_id))
+    return redirect(url_for('video_result_page', generation_id=generation_id))
 
 @app.route('/video_result_page/<generation_id>')
 def video_result_page(generation_id):
@@ -467,6 +471,7 @@ def video_result(generation_id):
         return jsonify({'status': 'complete', 'video_url': video_url})
     else:
         return jsonify({'status': 'error', 'message': response.json()})
+
 
 
     
