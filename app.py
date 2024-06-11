@@ -414,6 +414,10 @@ def edited():
     image_filename = request.args.get('image_filename')
     return render_template('edited.html', image_filename=image_filename)
 
+@app.route('/generate_video', methods=['GET'])
+def generate_video_form():
+    return render_template('video_generate.html')
+
 @app.route('/generate_video', methods=['POST'])
 def generate_video():
     api_key = session.get('api_key')
