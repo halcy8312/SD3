@@ -198,6 +198,7 @@ video_save_folder = 'static/videos'
 if not os.path.exists(video_save_folder):
     os.makedirs(video_save_folder)
 
+
 @app.route('/generate_video', methods=['POST'])
 def generate_video():
     api_key = session.get('api_key')
