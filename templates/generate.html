@@ -12,19 +12,19 @@
     {% endif %}
     <form method="post" id="generate-form" enctype="multipart/form-data">
         <div class="form-group">
-            <label for="prompt">プロンプト:</label><br>
-            <textarea id="prompt" name="prompt" rows="3" placeholder="プロンプトをカンマで区切って入力してください" oninput="updateCharacterCount('prompt', 'prompt-char-count')"></textarea><br>
-            <span id="prompt-char-count">あと10000文字</span>
+            <label for="prompt">プロンプト:</label>
+            <textarea id="prompt" name="prompt" rows="3" placeholder="プロンプトをカンマで区切って入力してください" oninput="updateCharacterCount('prompt', 'prompt-char-count')"></textarea>
+            <span id="prompt-char-count" class="char-count">あと10000文字</span>
             <p class="note">画像生成に望む内容を具体的に記述してください。詳細なプロンプトが良い結果をもたらします。</p>
         </div>
         <div class="form-group">
-            <label for="negative_prompt">ネガティブプロンプト:</label><br>
-            <textarea id="negative_prompt" name="negative_prompt" rows="3" placeholder="ネガティブプロンプトをカンマで区切って入力してください" oninput="updateCharacterCount('negative_prompt', 'negative-prompt-char-count')"></textarea><br>
-            <span id="negative-prompt-char-count">あと10000文字</span>
+            <label for="negative_prompt">ネガティブプロンプト:</label>
+            <textarea id="negative_prompt" name="negative_prompt" rows="3" placeholder="ネガティブプロンプトをカンマで区切って入力してください" oninput="updateCharacterCount('negative_prompt', 'negative-prompt-char-count')"></textarea>
+            <span id="negative-prompt-char-count" class="char-count">あと10000文字</span>
             <p class="note">出力画像に含めたくない内容を記述してください。特定の要素を除外したい場合に使用します。</p>
         </div>
         <div class="form-group">
-            <label for="aspect_ratio">アスペクト比:</label><br>
+            <label for="aspect_ratio">アスペクト比:</label>
             <select id="aspect_ratio" name="aspect_ratio">
                 <option value="1:1">1:1</option>
                 <option value="16:9">16:9（横長）</option>
@@ -35,11 +35,11 @@
                 <option value="5:4">5:4</option>
                 <option value="9:16">9:16</option>
                 <option value="9:21">9:21（Ultraではエラーが出ます。）</option>
-            </select><br>
+            </select>
             <p class="note">生成する画像のアスペクト比を選択してください。</p>
         </div>
         <div class="form-group">
-            <label for="style_preset">スタイルプリセット:</label><br>
+            <label for="style_preset">スタイルプリセット:</label>
             <select id="style_preset" name="style_preset">
                 <option value="enhance">enhance</option>
                 <option value="anime">anime</option>
@@ -58,26 +58,26 @@
                 <option value="3d-model">3d-model</option>
                 <option value="pixel-art">pixel-art</option>
                 <option value="tile-texture">tile-texture</option>
-            </select><br>
+            </select>
             <p class="note">生成画像のスタイルを選択してください。</p>
         </div>
         <div class="form-group">
-            <label for="model">モデル:</label><br>
+            <label for="model">モデル:</label>
             <select id="model" name="model">
                 <option value="sd3">sd3（6.5クレジット/成功生成）</option>
                 <option value="sd3-turbo">sd3-turbo（動作しなくなった..）</option>
                 <option value="ultra">ultra（8クレジット/成功生成）</option>
-            </select><br>
+            </select>
             <p class="note">使用するモデルを選択してください。Ultraモデルは8クレジットが必要です。</p>
         </div>
         <div class="form-group">
-            <label for="seed">シード（任意）:</label><br>
-            <input type="text" id="seed" name="seed" placeholder="任意のシード値を入力してください"><br>
+            <label for="seed">シード（任意）:</label>
+            <input type="text" id="seed" name="seed" placeholder="任意のシード値を入力してください">
             <p class="note">生成に使用する乱数シードを指定できます。指定しない場合はランダムになります。</p>
         </div>
         <div class="form-group">
-            <label for="image_to_image">画像をアップロード（任意）:</label><br>
-            <input type="file" id="image_to_image" name="image_to_image"><br>
+            <label for="image_to_image">画像をアップロード（任意）:</label>
+            <input type="file" id="image_to_image" name="image_to_image">
             <p class="note">画像をアップロードすると、プロンプトに基づいて画像から画像を生成します。</p>
         </div>
         <button type="submit" class="generate-button">画像生成</button>
