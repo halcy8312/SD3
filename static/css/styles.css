@@ -137,7 +137,7 @@ button.generate-button:hover, button.edit-button:hover {
     font-size: 24px;
     font-weight: bold;
     color: #00f;
-    text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+    text-shadow: 0 0 10px rgba(206, 239, 254, 0.7);
 }
 
 .navbar .logo-container {
