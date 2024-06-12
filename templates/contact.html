@@ -3,7 +3,16 @@
 {% block title %}お問い合わせ{% endblock %}
 
 {% block content %}
-<h1>お問い合わせ（まだ未動作です）</h1>
+<h1>お問い合わせ</h1>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
 <form method="post">
     <label for="name">名前:</label><br>
     <input type="text" id="name" name="name" required><br>

@@ -6,6 +6,7 @@ import base64
 from werkzeug.utils import secure_filename
 from PIL import Image
 import io
+from flask_mail import Mail, Message
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.getenv('SECRET_KEY', 'supersecretkey')
@@ -241,7 +242,40 @@ def image_to_image(image, prompt, negative_prompt, api_key, model, seed=None, ou
         print(f"An error occurred: {err}")
         raise Exception(f"An unexpected error occurred: {err}")
 
+# Flask-Mail configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # GmailのSMTPサーバー
+app.config['MAIL_PORT'] = 465  # SSLを使用する場合のポート
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = '2katakata1@gmail.com'  # 送信元のメールアドレス
+app.config['MAIL_PASSWORD'] = 'hwhmwyyfwwkifrpf'  # 送信元のメールアカウントのパスワード（アプリパスワードを使用してください）
 
+mail = Mail(app)
+
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        message = request.form['message']
+        
+        # メールの設定
+        msg = Message('お問い合わせ', 
+                      sender='2katakata1@gmail.com',  # 送信元のメールアドレス
+                      recipients=['2katakata1@gmail.com'])  # 受信先のメールアドレス
+        msg.body = f"名前: {name}\nメールアドレス: {email}\nメッセージ:\n{message}"
+        
+        try:
+            mail.send(msg)
+            flash('お問い合わせが送信されました。')
+        except Exception as e:
+            flash('メールの送信に失敗しました。再度お試しください。')
+            print(e)
+        
+        return redirect(url_for('contact'))
+    
+    return render_template('contact.html')
+    
 @app.route('/', methods=['GET', 'POST'])
 def index():
     credits = None
