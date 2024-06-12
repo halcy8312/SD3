@@ -70,11 +70,16 @@ def generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key,
     try:
         response = requests.post(url, headers=headers, files=files)
         response.raise_for_status()
+        
+        # レスポンスヘッダーからseed値を取得
+        generated_seed = response.headers.get("seed")
+        print("Generated seed:", generated_seed)
+        
         file_name = get_unique_filename(output_format)
         file_path = f"static/{file_name}.{output_format}"
         with open(file_path, 'wb') as file:
             file.write(response.content)
-        return file_path
+        return file_path, generated_seed  # 画像パスとseed値を返す
     except requests.exceptions.HTTPError as http_err:
         try:
             error_message = response.json()
@@ -313,10 +318,10 @@ def generate():
         seed = int(seed) if seed else None
 
         try:
-            image_path = generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key, model, seed)
+            image_path, generated_seed = generate_image(prompt, negative_prompt, aspect_ratio, style_preset, api_key, model, seed)
             image_filename = os.path.basename(image_path)
             session['credits'] = get_credits(api_key)
-            return redirect(url_for('generated', image_filename=image_filename))
+            return render_template('generated.html', image_filename=image_filename, seed=generated_seed)  # seedをテンプレートに渡す
         except Exception as e:
             return str(e)
     return render_template('generate.html', credits=session.get('credits'))
