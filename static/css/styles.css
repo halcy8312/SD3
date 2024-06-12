@@ -132,3 +132,20 @@ button.generate-button:hover, button.edit-button:hover {
         margin-top: 10px;
     }
 }
+
+.site-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00f;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+}
+
+.navbar .logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    height: 40px;
+    margin-right: 10px;
+}

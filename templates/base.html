@@ -6,16 +6,38 @@
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/oekaki_styles.css') }}">
+    <style>
+        .logo {
+            height: 40px;
+            margin-right: 10px;
+        }
+        .navbar .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        .site-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00f;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+        }
+    </style>
 </head>
 <body>
     <div class="navbar">
+        <div class="logo-container">
+            <a href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="SD GEN" class="logo">
+            </a>
+            <span class="site-title">SD GEN</span>
+        </div>
         <a href="{{ url_for('generate') }}" class="nav-button">画像生成</a>
         <a href="{{ url_for('upscale') }}" class="nav-button">アップスケール</a>
         <a href="{{ url_for('oekaki_index') }}" class="nav-button">Oekaki</a>
         <a href="{{ url_for('index') }}" class="nav-button">API</a>
         <a href="{{ url_for('edit') }}" class="nav-button">画像編集</a>
         <a href="{{ url_for('generate_video') }}" class="nav-button">ビデオ生成</a>
-        <a href="{{ url_for('control') }}" class="nav-button">Control機能</a> <!-- 新しいリンクを追加 -->
+        <a href="{{ url_for('control') }}" class="nav-button">Control機能</a>
         <a href="{{ url_for('contact') }}" class="nav-button">お問い合わせ</a>
         <a href="{{ url_for('privacy_policy') }}" class="nav-button">プライバシーポリシー</a>
         <a href="{{ url_for('terms_of_service') }}" class="nav-button">利用規約</a>
