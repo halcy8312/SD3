@@ -6,6 +6,7 @@
 <h1>Video Result</h1>
 <p>Generation ID: {{ generation_id }}</p>
 <p>Status: <span id="status">Checking...</span></p>
+<p>Seed: <span id="seed">Fetching...</span></p>
 <video id="video" controls style="display: none;"></video>
 <a id="download_link" href="" download="generated_video.mp4" style="display: none;"><button>Download Video</button></a>
 
@@ -16,6 +17,7 @@ function checkStatus() {
         .then(data => {
             if (data.status === 'complete') {
                 document.getElementById('status').textContent = 'Complete!';
+                document.getElementById('seed').textContent = data.seed;
                 const videoElement = document.getElementById('video');
                 videoElement.src = data.video_url;
                 videoElement.style.display = 'block';

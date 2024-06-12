@@ -551,10 +551,11 @@ def video_result(generation_id):
         with open(file_path, 'wb') as file:
             file.write(response.content)
         video_url = url_for('static', filename=f'videos/{generation_id}.mp4')
-        return jsonify({'status': 'complete', 'video_url': video_url})
+        # レスポンスヘッダーからseed値を取得
+        generated_seed = response.headers.get("seed")
+        return jsonify({'status': 'complete', 'video_url': video_url, 'seed': generated_seed})
     else:
         return jsonify({'status': 'error', 'message': response.json()})
-
     
 @app.route('/edit', methods=['GET', 'POST'])
 def edit():
