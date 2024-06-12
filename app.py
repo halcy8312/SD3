@@ -408,13 +408,6 @@ def upscaled():
 def download_image(filename):
     return send_file(f'static/{filename}', as_attachment=True)
 
-@app.route('/contact', methods=['GET', 'POST'])
-def contact():
-    if request.method == 'POST':
-        # お問い合わせ処理
-        pass
-    return render_template('contact.html')
-
 @app.route('/privacy_policy')
 def privacy_policy():
     return render_template('privacy_policy.html')
