@@ -258,23 +258,31 @@ def contact():
         name = request.form['name']
         email = request.form['email']
         message = request.form['message']
-        
-        # メールの設定
-        msg = Message('お問い合わせ', 
-                      sender='2katakata1@gmail.com',  # 送信元のメールアドレス
-                      recipients=['2katakata1@gmail.com'])  # 受信先のメールアドレス
-        msg.body = f"名前: {name}\nメールアドレス: {email}\nメッセージ:\n{message}"
-        
+
+        # 管理者へのメール
+        msg_to_admin = Message('お問い合わせ', 
+                               sender='2katakata1@gmail.com',
+                               recipients=['2katakata1@gmail.com'])
+        msg_to_admin.body = f"名前: {name}\nメールアドレス: {email}\nメッセージ:\n{message}"
+
+        # ユーザーへの自動返信メール
+        msg_to_user = Message('お問い合わせありがとうございます', 
+                              sender='2katakata1@gmail.com',
+                              recipients=[email])
+        msg_to_user.body = f"{name} 様\n\nお問い合わせいただきありがとうございます。\n以下の内容でお問い合わせを受け付けました。\n\n---\nお名前: {name}\nメールアドレス: {email}\nメッセージ:\n{message}\n---\n\nこのメールは自動返信です。個別での返信はできませんのでご了承ください。"
+
         try:
-            mail.send(msg)
+            mail.send(msg_to_admin)
+            mail.send(msg_to_user)
             flash('お問い合わせが送信されました。')
         except Exception as e:
             flash('メールの送信に失敗しました。再度お試しください。')
             print(e)
-        
+
         return redirect(url_for('contact'))
-    
+
     return render_template('contact.html')
+
     
 @app.route('/', methods=['GET', 'POST'])
 def index():
