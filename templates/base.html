@@ -7,29 +7,19 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/oekaki_styles.css') }}">
     <style>
-        .logo {
-            height: 40px;
-            margin-right: 10px;
-        }
-        .navbar .logo-container {
-            display: flex;
-            align-items: center;
-        }
         .site-title {
             font-size: 24px;
             font-weight: bold;
-            color: #00f;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+            color: #00bfff; /* 水色に変更 */
+            text-shadow: 0 0 10px rgba(0, 191, 255, 0.7); /* 柔らかい光 */
+            text-decoration: none; /* リンクの下線を消す */
         }
     </style>
 </head>
 <body>
     <div class="navbar">
         <div class="logo-container">
-            <a href="{{ url_for('index') }}">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="SD GEN" class="logo">
-            </a>
-            <span class="site-title">SD GEN</span>
+            <a href="{{ url_for('index') }}" class="site-title">SD GEN</a>
         </div>
         <a href="{{ url_for('generate') }}" class="nav-button">画像生成</a>
         <a href="{{ url_for('upscale') }}" class="nav-button">アップスケール</a>

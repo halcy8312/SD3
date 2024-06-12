@@ -136,16 +136,12 @@ button.generate-button:hover, button.edit-button:hover {
 .site-title {
     font-size: 24px;
     font-weight: bold;
-    color: #00f;
-    text-shadow: 0 0 10px rgba(206, 239, 254, 0.7);
+    color: #00bfff; /* 水色に変更 */
+    text-shadow: 0 0 10px rgba(0, 191, 255, 0.7); /* 柔らかい光 */
+    text-decoration: none; /* リンクの下線を消す */
 }
 
 .navbar .logo-container {
     display: flex;
     align-items: center;
-}
-
-.logo {
-    height: 40px;
-    margin-right: 10px;
 }
